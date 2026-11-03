@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>جواز صياد الشمس</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Layout: a passport booklet — navy cover with the holder's name, a page of eight stamp slots, then the stamp quiz and the certificate. Kit identity: navy, sun amber, teal, stamp red. */
+:root {
+  --bg: #FFF6E0; --paper: #FFFDF6; --ink: #12355B; --ink-soft: #3C5875; --line: rgba(18,53,91,.22);
+  --sun: #FFB400; --sun-deep: #E2572B; --teal: #1FA3A3; --good: #2E9E5B; --bad: #C2412D; --stamp: #B8431C; --chip: #F3E7C7; --cover: #12355B; --cover-ink: #FFF6E0;
+  --f-display: 'Cairo', 'Tajawal', system-ui, sans-serif; --f-body: 'Tajawal', 'Cairo', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1E31; --paper: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --stamp: #FF8A5C; --chip: #1D3757; --cover: #0A1626; --cover-ink: #FFF6E0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1E31; --paper: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --stamp: #FF8A5C; --chip: #1D3757; --cover: #0A1626; --cover-ink: #FFF6E0; color-scheme: dark }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; direction: rtl;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 32px }
+.wrap { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px }
+.cover { background: var(--cover); color: var(--cover-ink); border-radius: 22px; padding: 20px 24px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; box-shadow: 0 8px 0 rgba(0,0,0,.12) }
+.cover h1 { font-family: var(--f-display); font-weight: 900; font-size: clamp(26px, 5vw, 38px); margin: 0; line-height: 1.15; color: var(--sun) }
+.cover p { margin: 2px 0 0; font-size: 15px; opacity: .9 }
+.namebox { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap }
+.namebox label { font-weight: 700 }
+.namebox input { font-family: var(--f-display); font-weight: 700; font-size: 18px; border: 2px solid var(--sun); background: transparent; color: var(--cover-ink); border-radius: 10px; padding: 4px 10px; min-width: 0; flex: 1; max-width: 300px }
+.progress { font-family: var(--f-display); font-weight: 800; font-size: 15px; color: var(--sun) }
+.stamps { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; padding: 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;
+  background-image: repeating-linear-gradient(0deg, transparent 0 27px, rgba(18,53,91,.05) 27px 28px) }
+.slot { border: none; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink); font-family: var(--f-body); padding: 4px; border-radius: 14px; min-width: 0 }
+.slot:hover .ring { transform: scale(1.04) }
+.slot:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px }
+.ring { width: 100%; max-width: 132px; aspect-ratio: 1; border-radius: 50%; border: 3px dashed var(--line); display: flex; align-items: center; justify-content: center; transition: transform .15s; position: relative }
+.ring .n { font-family: var(--f-display); font-weight: 900; font-size: 34px; color: var(--line) }
+.slot.got .ring { border: 4px double var(--stamp); color: var(--stamp); transform: rotate(-8deg) }
+.slot.got .ring svg { width: 82% }
+.slot .lbl { font-family: var(--f-display); font-weight: 800; font-size: 14.5px; text-align: center; line-height: 1.3 }
+.slot .st { font-size: 12.5px; color: var(--ink-soft) }
+.slot.got .st { color: var(--good); font-weight: 700 }
+.quiz { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px }
+.quiz h2 { font-family: var(--f-display); font-weight: 800; font-size: 22px; margin: 0 }
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
+.dots { display: flex; gap: 6px }
+.dots span { width: 12px; height: 12px; border-radius: 50%; background: var(--chip) }
+.dots span.ok { background: var(--good) } .dots span.no { background: var(--bad) } .dots span.cur { outline: 2px solid var(--ink) }
+.q { font-family: var(--f-display); font-weight: 800; font-size: 19px; line-height: 1.45 }
+.opts { display: flex; flex-direction: column; gap: 8px }
+.opt { text-align: right; font-family: var(--f-body); font-size: 17px; font-weight: 500; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 14px; padding: 10px 14px; cursor: pointer; min-height: 48px }
+.opt:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px }
+.opt.right { background: var(--good); border-color: var(--good); color: #fff }
+.opt.wrong { background: var(--bad); border-color: var(--bad); color: #fff }
+.opt:disabled { cursor: default }
+.fb { border-radius: 14px; padding: 10px 14px; background: var(--chip); font-size: 15.5px }
+.fb b { font-family: var(--f-display) }
+.row { display: flex; gap: 8px; flex-wrap: wrap }
+.btn { font-family: var(--f-display); font-weight: 800; font-size: 16px; border: 2px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: 12px; padding: 8px 16px; cursor: pointer; min-height: 44px }
+.btn.ghost { background: var(--paper); color: var(--ink) }
+.btn:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px }
+.result { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px }
+.result .big { font-family: var(--f-display); font-weight: 900; font-size: 30px }
+.cert { background: var(--paper); border: 6px double var(--sun-deep); border-radius: 22px; padding: 22px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px }
+.cert h2 { font-family: var(--f-display); font-weight: 900; font-size: clamp(24px, 5vw, 34px); color: var(--sun-deep); margin: 0 }
+.cert .who { font-family: var(--f-display); font-weight: 900; font-size: clamp(26px, 6vw, 40px); border-bottom: 3px solid var(--sun); padding: 0 18px; min-width: 60% }
+.cert p { margin: 0; max-width: 560px }
+.small { font-size: 13.5px; color: var(--ink-soft) }
+@media (max-width: 620px) { .stamps { grid-template-columns: repeat(2, minmax(0, 1fr)) } .cover { grid-template-columns: 1fr } .cover svg { width: 70px } }
+@media (prefers-reduced-motion: reduce) { .ring { transition: none } }
+</style>
+
+<div class="wrap">
+  <section class="cover">
+    <svg width="96" height="96" viewBox="0 0 200 200" aria-hidden="true">
+      <g stroke-width="9" stroke-linecap="round" stroke="#FFB400">
+        <line x1="100" y1="14" x2="100" y2="32"/><line x1="100" y1="168" x2="100" y2="186"/><line x1="14" y1="100" x2="32" y2="100"/><line x1="168" y1="100" x2="186" y2="100"/>
+        <line x1="39" y1="39" x2="52" y2="52"/><line x1="148" y1="148" x2="161" y2="161"/><line x1="39" y1="161" x2="52" y2="148"/><line x1="148" y1="52" x2="161" y2="39"/>
+      </g>
+      <circle cx="100" cy="100" r="52" fill="#E2572B"/><path d="M100 48 A52 52 0 0 1 100 152 Z" fill="#FFF6E0"/>
+    </svg>
+    <div>
+      <h1>جواز صياد الشمس</h1>
+      <p>أجب عن خمسة أسئلة بعد كل وحدة. أربعة أجوبة صحيحة على الأقل = ختم في جوازك.</p>
+      <div class="namebox"><label for="nm">صاحب الجواز:</label><input id="nm" type="text" autocomplete="off" placeholder="اكتب اسمك"></div>
+      <div class="progress" id="prog"></div>
+    </div>
+  </section>
+
+  <section class="stamps" id="stamps" aria-label="أختام الوحدات الثماني"></section>
+  <section class="quiz" id="quiz" hidden></section>
+  <section class="cert" id="cert" hidden></section>
+  <p class="small">صيّاد الشمس · مهد لابز · من مهد الإبداع. الأختام محفوظة في هذا الجهاز وهذا المتصفح فقط.</p>
+</div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const UNITS = [
+  { t: 'من أين تأتي الطاقة؟', icon: 'sun', qs: [
+    ['متى يكون ظل العصا أقصر؟', ['قرب الظهيرة', 'في الصباح الباكر', 'قبل الغروب'], 'حين تعلو الشمس في السماء قرب الظهيرة يقصر الظل.'],
+    ['في الصباح، إلى أين يتجه ظل العصا؟', ['نحو الغرب', 'نحو الشرق', 'نحو الجنوب'], 'الشمس تشرق من الشرق، والظل دائما في الجهة المقابلة لها.'],
+    ['أين تكون الشمس بالنسبة للظل؟', ['في الجهة المقابلة له', 'في جهته نفسها', 'لا علاقة بينهما'], 'الشمس في الجهة المقابلة للظل دائما.'],
+    ['متى تبلغ حرارة الشمس ذروتها تقريبا؟', ['حول الظهيرة أو بعدها بقليل', 'عند الشروق', 'عند الغروب'], 'تعلو الشمس فتشتد أشعتها، وقد تتأخر الحرارة قليلا بعد الظهر.'],
+    ['لماذا يبدو أن الشمس تتحرك في السماء؟', ['لأن الأرض تدور', 'لأن الغيوم تدفعها', 'لأن الظل يسحبها'], 'الأرض تدور حول نفسها، فتبدو الشمس متحركة.']] },
+  { t: 'صائد الحرارة', icon: 'cup', qs: [
+    ['أيّ كوب يسخن أكثر في الشمس؟', ['الملفوف بالورق الأسود', 'الملفوف بالورق الأبيض', 'يسخنان دائما بالقدر نفسه'], 'الغامق يصطاد الحرارة أكثر.'],
+    ['لماذا يسخن الأسود أكثر؟', ['يمتص معظم الضوء فيتحول حرارة', 'يجذب الحرارة من الهواء', 'لأنه أثقل'], 'الأسود يمتص الضوء، والضوء الممتص يصير حرارة.'],
+    ['ماذا يفعل اللون الأبيض بضوء الشمس؟', ['يعكس جزءا كبيرا منه', 'يخزّنه لليل', 'يحوّله إلى كهرباء'], 'الأبيض يعكس الضوء، ولهذا تُطلى بيوت كثيرة بالأبيض.'],
+    ['ماذا يحدث للكوب داخل كيس شفاف؟', ['يسخن أكثر لأن الحرارة لا تخرج', 'يبرد أكثر', 'لا يتغير شيء'], 'الضوء يدخل عبر الغطاء الشفاف، والحرارة لا تخرج بسهولة.'],
+    ['كيف نقرأ اللاصق الحراري؟', ['الرقم الذي يضيء بالأخضر', 'أكبر رقم عليه', 'أول رقم من اليمين'], 'الرقم الأخضر هو الحرارة.']] },
+  { t: 'سخّان الماء الشمسي', icon: 'tank', qs: [
+    ['أيّ لون نختار لخزان سخان شمسي؟', ['أسود', 'أبيض', 'فضي لامع'], 'الأسود يمتص الضوء أكثر فيسخن الماء.'],
+    ['لماذا نضع غطاء شفافا فوق السخان؟', ['ليدخل الضوء وتبقى الحرارة', 'ليمنع الضوء', 'ليبرد الماء'], 'الغطاء الشفاف يحبس الحرارة.'],
+    ['ماذا يفعل العاكس من الألمنيوم؟', ['يوجّه مزيدا من الضوء نحو السخان', 'يمتص الحرارة', 'يبرّد الماء'], 'العاكس يرسل ضوءا إضافيا إلى السخان.'],
+    ['لماذا نعزل السخان؟', ['لكي لا تهرب الحرارة', 'ليصبح أخف', 'ليدخل الهواء البارد'], 'العزل يحفظ الحرارة داخل السخان.'],
+    ['متى نحصل على أفضل نتيجة من السخان؟', ['في ساعات الذروة حول الظهيرة', 'عند الفجر', 'في الليل'], 'الشمس أقوى حول الظهيرة.']] },
+  { t: 'فرن الشمس', icon: 'oven', qs: [
+    ['ما دور الألمنيوم في فرن الشمس؟', ['يعكس الضوء نحو الطعام', 'يجعل الفرن أثقل', 'يمنع الضوء من الدخول'], 'الألمنيوم يعكس الضوء نحو الداخل.'],
+    ['لماذا ندير الفرن كل فترة؟', ['ليبقى موجّها نحو الشمس', 'ليبرد قليلا', 'ليختلط الطعام'], 'الشمس تتحرك، فنتبعها.'],
+    ['لماذا نطبخ ببطء في فرن الشمس؟', ['لأن حرارته أقل من حرارة فرن الغاز', 'لأن الطعام يحب البطء', 'لأن الفرن مظلم'], 'فرن الشمس يطبخ بحرارة أقل، فيحتاج وقتا أطول.'],
+    ['ماذا يفعل العزل في الفرن؟', ['يحبس الحرارة داخله', 'يزيد الضوء', 'يبرّد الطعام'], 'العزل يمنع الحرارة من الهروب.'],
+    ['كم قد تبلغ حرارة فرن الشمس في يوم صيفي؟', ['نحو 90 درجة أو أكثر', 'نحو 10 درجات', 'نحو 500 درجة'], 'في الصيف قد يبلغ 90 درجة أو أكثر.']] },
+  { t: 'الخلية تصطاد الضوء', icon: 'panel', qs: [
+    ['ماذا تحوّل الخلية الشمسية؟', ['الضوء إلى كهرباء', 'الحرارة إلى ضوء', 'الكهرباء إلى ضوء'], 'الخلية تصطاد الضوء وتحوّله كهرباء.'],
+    ['ماذا يحدث حين يقلّ الضوء على الخلية؟', ['تقل الكهرباء ويخفت المصباح', 'تزيد الكهرباء', 'لا يتغير شيء'], 'ضوء أقل = كهرباء أقل.'],
+    ['ما أفضل وضع للوح؟', ['أن يواجه الشمس مباشرة', 'أن يكون موازيا للأشعة', 'أن يدير ظهره للشمس'], 'حين يواجه الشمس يصله أكبر قدر من الضوء.'],
+    ['لماذا يُطفئ ظل على خلية واحدة اللوح كله تقريبا؟', ['لأن الخلايا موصولة في سلسلة', 'لأن الخلية المظلمة تسخن', 'لأن الكرتون ثقيل'], 'في السلسلة لا تجري الكهرباء أسرع من أضعف حلقة.'],
+    ['ماذا يقيس الفولتمتر؟', ['الجهد بالفولت', 'الحرارة', 'لون الضوء'], 'الفولتمتر يقيس الجهد: «قوة دفع» الكهرباء.']] },
+  { t: 'مهندس الطاقة الصغير', icon: 'house', qs: [
+    ['لوحان، كل منهما نحو 6 فولت، على التوالي يعطيان نحو…', ['12 فولت', '6 فولت', '3 فولت'], 'على التوالي يُجمع الجهد.'],
+    ['لماذا تحتاج المحطة بطارية؟', ['لتستعمل الكهرباء ليلا', 'لتبرّد الألواح', 'لتنظّف الألواح'], 'البطارية تخزّن كهرباء النهار.'],
+    ['ما دور منظم الشحن؟', ['يوزّع الكهرباء ويحمي البطارية', 'يصنع الكهرباء من الضوء', 'يحوّل الكهرباء إلى 220 فولت'], 'المنظم هو «عقل» المحطة.'],
+    ['أيّ جهاز يحتاج محوّلا؟', ['الثلاجة', 'المصباح الصغير (12 فولت)', 'اللوح الشمسي'], 'الثلاجة تعمل بـ220 فولت مثل المقبس.'],
+    ['مع لوحين على التوالي، كم مصباحا يضيء في السلسلة مقارنة بلوح واحد؟', ['أكثر', 'أقل', 'العدد نفسه'], 'جهد أكبر = مصابيح أكثر في السلسلة.']] },
+  { t: 'نور: الشمس التي تضيء المغرب', icon: 'tower', qs: [
+    ['كيف ينتج نور 3 الكهرباء؟', ['حرارة ← بخار ← توربين ← مولّد', 'بالألواح فقط', 'بالرياح'], 'نور 3 محطة حرارية: الحرارة تصنع البخار الذي يدير التوربين.'],
+    ['لماذا يحوّل نور الحرارة إلى كهرباء؟', ['لأن الكهرباء تسافر بعيدا في الأسلاك', 'لأن الحرارة خطيرة', 'لأن الحرارة لا تُقاس'], 'الحرارة تضيع في الطريق، والكهرباء تصل إلى المدن.'],
+    ['كيف ينتج نور كهرباء بعد الغروب؟', ['بملح ساخن مخزّن', 'ببطاريات ضخمة', 'بضوء القمر'], 'الملح يحفظ الحرارة ساعات طويلة.'],
+    ['أيّ محطة في نور تعمل بالألواح؟', ['نور 4', 'نور 1', 'نور 3'], 'نور 1 و2 و3 حرارية، ونور 4 ضوئية.'],
+    ['ما الفرق الحقيقي بين الحراري والضوئي؟', ['التخزين والكلفة', 'الحراري أفعل بعشر مرات', 'الضوئي لا يعمل نهارا'], 'فعاليتهما متقاربة، والحراري يخزّن لليل، والضوئي أرخص.']] },
+  { t: 'الباحث الميداني', icon: 'lens', qs: [
+    ['ما أول مرحلة في البحث؟', ['أسأل: أحدد سؤال بحثي', 'أكتب التقرير', 'ألتقط الصور'], 'كل بحث يبدأ بسؤال.'],
+    ['أيّ سؤال مفتوح؟', ['«كيف تختار اللوح المناسب لبيت؟»', '«هل تبيع ألواحا؟»', '«هل المحل مفتوح اليوم؟»'], 'السؤال المفتوح يبدأ غالبا بكيف أو لماذا.'],
+    ['قبل تصوير شخص، ماذا أفعل؟', ['أستأذنه', 'ألتقط الصورة بسرعة', 'لا شيء'], 'نستأذن دائما قبل التصوير.'],
+    ['ماذا أدوّن أثناء اللقاء؟', ['كلمات مفتاحية', 'كل كلمة حرفيا', 'لا شيء'], 'الكلمات المفتاحية تسمح لي بالإصغاء.'],
+    ['ما فائدة جدول «كنت أظن / اكتشفت»؟', ['أرى ما تعلّمته فعلا', 'أزيّن التقرير', 'أعدّ الصور'], 'المقارنة تُظهر ما تغيّر في فهمي.']] }
+];
+const ICONS = {
+  sun: '<circle cx="50" cy="50" r="18" fill="currentColor"/><g stroke="currentColor" stroke-width="6" stroke-linecap="round"><line x1="50" y1="10" x2="50" y2="22"/><line x1="50" y1="78" x2="50" y2="90"/><line x1="10" y1="50" x2="22" y2="50"/><line x1="78" y1="50" x2="90" y2="50"/><line x1="22" y1="22" x2="30" y2="30"/><line x1="70" y1="70" x2="78" y2="78"/><line x1="22" y1="78" x2="30" y2="70"/><line x1="70" y1="30" x2="78" y2="22"/></g>',
+  cup: '<path d="M28 30 H72 L66 82 H34 Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/><path d="M40 22 q5 -8 0 -14 M52 22 q5 -8 0 -14 M64 22 q5 -8 0 -14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>',
+  tank: '<rect x="16" y="30" width="68" height="34" rx="17" fill="none" stroke="currentColor" stroke-width="6"/><path d="M24 64 L14 86 M76 64 L86 86" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>',
+  oven: '<path d="M14 80 L30 36 H70 L86 80 Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/><path d="M30 36 L50 14 L70 36" fill="none" stroke="currentColor" stroke-width="5"/>',
+  panel: '<path d="M14 72 L28 30 H86 L72 72 Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/><path d="M21 51 H79 M47 30 L40 72 M67 30 L60 72" stroke="currentColor" stroke-width="3"/>',
+  house: '<path d="M18 86 V46 L50 18 L82 46 V86 Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/><path d="M44 50 L36 66 H48 L40 82" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>',
+  tower: '<path d="M42 88 L46 22 H54 L58 88" fill="none" stroke="currentColor" stroke-width="6"/><rect x="40" y="10" width="20" height="14" fill="currentColor"/><path d="M14 80 L30 72 M70 72 L86 80" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>',
+  lens: '<circle cx="42" cy="42" r="24" fill="none" stroke="currentColor" stroke-width="7"/><path d="M60 60 L84 84" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>'
+};
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+let got = store.get('passport-stamps', {});   // unit index -> date string
+const nm = $('nm'); nm.value = store.get('passport-name', '');
+nm.addEventListener('input', () => { store.set('passport-name', nm.value.trim()); renderCert(); });
+
+function renderStamps() {
+  const box = $('stamps'); box.innerHTML = '';
+  UNITS.forEach((u, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'slot' + (got[i] ? ' got' : '');
+    b.setAttribute('aria-label', `الوحدة ${i + 1}: ${u.t}` + (got[i] ? ' (مختومة)' : ''));
+    b.innerHTML = `<span class="ring">${got[i] ? `<svg viewBox="0 0 100 100" aria-hidden="true">${ICONS[u.icon]}</svg>` : `<span class="n">${i + 1}</span>`}</span><span class="lbl">الوحدة ${i + 1}<br>${u.t}</span><span class="st">${got[i] ? 'مختومة · ' + got[i] : 'اضغط لتربح الختم'}</span>`;
+    b.onclick = () => startQuiz(i);
+    box.appendChild(b);
+  });
+  const n = Object.keys(got).length;
+  $('prog').textContent = `الأختام: ${n} من 8`;
+  renderCert();
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+let Q = null;
+function startQuiz(i) { Q = { u: i, k: 0, res: [] }; $('quiz').hidden = false; renderQ(); $('quiz').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
+function renderQ() {
+  const u = UNITS[Q.u], box = $('quiz');
+  const dots = u.qs.map((_, j) => `<span class="${Q.res[j] === true ? 'ok' : Q.res[j] === false ? 'no' : ''}${j === Q.k ? ' cur' : ''}"></span>`).join('');
+  if (Q.k >= u.qs.length) return renderResult();
+  const [q, opts, why] = u.qs[Q.k];
+  const sh = shuffle(opts.map((o, j) => ({ o, ok: j === 0 })));
+  box.innerHTML = `<div class="qhead"><h2>الوحدة ${Q.u + 1}: ${u.t}</h2><div class="dots" aria-label="السؤال ${Q.k + 1} من 5">${dots}</div></div>
+    <div class="q">${Q.k + 1}. ${q}</div><div class="opts">${sh.map((x, j) => `<button type="button" class="opt" data-j="${j}">${x.o}</button>`).join('')}</div><div id="fbx"></div>`;
+  box.querySelectorAll('.opt').forEach(btn => btn.onclick = () => {
+    const ok = sh[+btn.dataset.j].ok; Q.res[Q.k] = ok;
+    box.querySelectorAll('.opt').forEach((b, j) => { b.disabled = true; if (sh[j].ok) b.classList.add('right'); });
+    if (!ok) btn.classList.add('wrong');
+    $('fbx').innerHTML = `<div class="fb" role="status"><b>${ok ? 'أحسنت!' : 'ليس تماما.'}</b> ${why}</div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="nx">${Q.k < 4 ? 'السؤال التالي' : 'النتيجة'}</button></div>`;
+    $('nx').onclick = () => { Q.k++; renderQ(); }; $('nx').focus();
+  });
+}
+function renderResult() {
+  const u = UNITS[Q.u], score = Q.res.filter(Boolean).length, pass = score >= 4, box = $('quiz');
+  if (pass && !got[Q.u]) { got[Q.u] = new Date().toLocaleDateString('ar-MA'); store.set('passport-stamps', got); }
+  box.innerHTML = `<div class="result"><div class="big">${score} من 5</div>
+    <div>${pass ? `<b>ختم جديد!</b> ربحت ختم الوحدة ${Q.u + 1}: ${u.t}.` : 'تحتاج 4 أجوبة صحيحة على الأقل لتربح الختم. راجع دفترك وبطاقات الوحدة ثم حاول من جديد.'}</div>
+    <div class="row" style="justify-content:center"><button type="button" class="btn" id="again">${pass ? 'أعد اللعب' : 'حاول من جديد'}</button><button type="button" class="btn ghost" id="back">العودة إلى الجواز</button></div></div>`;
+  $('again').onclick = () => startQuiz(Q.u);
+  $('back').onclick = () => { box.hidden = true; $('stamps').scrollIntoView({ block: 'start' }); };
+  renderStamps();
+}
+function renderCert() {
+  const n = Object.keys(got).length, c = $('cert');
+  if (n < 8) { c.hidden = true; return; }
+  c.hidden = false;
+  const name = nm.value.trim() || 'صياد الشمس';
+  c.innerHTML = `<h2>شهادة صياد الشمس</h2><p>تشهد مهد لابز أن</p><div class="who">${name.replace(/[<>&]/g, '')}</div>
+    <p>جمع الأختام الثمانية، فتعلّم كيف يرصد الشمس، ويصطاد حرارتها، ويحوّل ضوءها إلى كهرباء، ويفهم محطة نور، ويبحث في الميدان كالعلماء.</p>
+    <p class="small">صيّاد الشمس · مهد لابز · من مهد الإبداع · by Creativity Cradle</p><p class="small">التقط صورة لهذه الشهادة واحتفظ بها!</p>`;
+}
+renderStamps();
+})();
+</script>
+
+<a href="index.html" style="position:fixed;z-index:50;top:calc(10px + env(safe-area-inset-top,0px));left:max(10px,env(safe-area-inset-left,0px));background:#12355B;color:#FFF6E0;font:700 14px Cairo,Tajawal,system-ui,sans-serif;text-decoration:none;padding:6px 14px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.2)">→ الطريق</a>
+<script>(function(){var m=location.hash.match(/^#u([1-8])$/);if(m){var b=document.querySelectorAll("#stamps .slot")[+m[1]-1];if(b)setTimeout(function(){b.click()},60);}})();</script>
+</body>
+</html>
