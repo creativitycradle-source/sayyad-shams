@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>ركّب محطتك</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Layout: one working bench — mission strip on top, the house scene in the middle, the day controls and meters under it. Kit identity: navy, sun amber, teal. */
+:root {
+  --bg: #FFF6E0; --panel: #FFFDF6; --ink: #12355B; --ink-soft: #3C5875; --line: rgba(18,53,91,.22);
+  --sun: #FFB400; --sun-deep: #E2572B; --teal: #1FA3A3; --good: #2E9E5B; --bad: #C2412D;
+  --chip: #F3E7C7; --btn-ink: #FFF6E0;
+  --f-display: 'Cairo', 'Tajawal', system-ui, sans-serif; --f-body: 'Tajawal', 'Cairo', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1E31; --panel: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --chip: #1D3757; --btn-ink: #0E1E31; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1E31; --panel: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --chip: #1D3757; --btn-ink: #0E1E31; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; direction: rtl;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 32px }
+.wrap { max-width: 1060px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 4vw, 34px); margin: 0; line-height: 1.2; text-wrap: balance }
+.sub { color: var(--ink-soft); font-size: 15px; margin: 2px 0 0 }
+.levels { display: flex; gap: 8px; flex-wrap: wrap }
+.lv { font-family: var(--f-display); font-weight: 700; font-size: 15px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center }
+.lv[aria-pressed="true"] { background: var(--ink); color: var(--btn-ink) }
+.lv .done { color: var(--good); font-size: 13px }
+.lv[aria-pressed="true"] .done { color: var(--sun) }
+.mission { background: var(--sun); color: #12355B; border-radius: 18px; padding: 12px 18px; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: center }
+.mission h2 { font-family: var(--f-display); font-weight: 800; font-size: 21px; margin: 0; line-height: 1.3 }
+.mission p { margin: 0; font-size: 16px; font-weight: 500; min-width: 0 }
+.mission .hintbtn { grid-row: 1 / span 2; grid-column: 2; font-family: var(--f-display); font-weight: 700; border: 2px solid #12355B; background: #FFF6E0; color: #12355B; border-radius: 12px; padding: 6px 12px; cursor: pointer }
+.stage { background: var(--panel); border: 2px solid var(--line); border-radius: 20px; overflow-x: auto; overflow-y: hidden }
+svg#scene { display: block; width: 100%; height: auto; touch-action: manipulation; user-select: none }
+.howto { font-size: 14.5px; color: var(--ink-soft); font-weight: 700; margin: 0 4px -6px }
+.msg { min-height: 52px; border-radius: 14px; padding: 10px 16px; font-size: 16px; font-weight: 500; background: var(--chip); color: var(--ink); display: flex; align-items: center; gap: 10px }
+.msg.good { background: var(--good); color: #fff }
+.msg.bad { background: var(--bad); color: #fff }
+.msg b { font-family: var(--f-display) }
+.bar { display: flex; flex-direction: column; gap: 10px }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 10px 12px }
+.btn { font-family: var(--f-display); font-weight: 700; font-size: 15.5px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 12px; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px }
+.btn.primary { background: var(--ink); color: var(--btn-ink) }
+.btn[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff }
+.btn:disabled { opacity: .4; cursor: default }
+.clock { font-family: var(--f-display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; direction: ltr; min-width: 82px; text-align: center }
+.panels { display: inline-flex; align-items: center; gap: 6px; border-inline-start: 2px solid var(--line); padding-inline-start: 10px }
+.panels .n { font-family: var(--f-display); font-weight: 800; font-size: 20px; min-width: 18px; text-align: center }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
+.meter { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 8px 12px; min-width: 0 }
+.meter .k { font-size: 13.5px; color: var(--ink-soft); font-weight: 700 }
+.meter .v { font-family: var(--f-display); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.3 }
+.meter .u { font-size: 13px; color: var(--ink-soft); font-weight: 700 }
+.meter .track { height: 8px; background: var(--chip); border-radius: 999px; overflow: hidden; margin-top: 4px }
+.meter .fill { height: 100%; width: 0; background: var(--sun); border-radius: 999px; transition: width .2s }
+.info { background: var(--panel); border: 2px dashed var(--line); border-radius: 16px; padding: 10px 16px; font-size: 15.5px }
+.info b { font-family: var(--f-display); font-size: 17px }
+button:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px }
+.hit { cursor: pointer }
+.hit:focus-visible { outline: none }
+.hit:focus-visible .ring { stroke: var(--sun-deep); stroke-width: 4 }
+@media (max-width: 760px) { .mission { grid-template-columns: 1fr } .mission .hintbtn { grid-row: auto; grid-column: auto; justify-self: start } .lbl { font-size: 30px; stroke-width: 8px } }
+@media (max-width: 460px) { .lbl { font-size: 36px } .meters { gap: 6px } .meter { padding: 6px 8px } .meter .k { font-size: 12px } .meter .v { font-size: 18px } .clock { font-size: 22px; min-width: 66px } }
+@media (prefers-reduced-motion: reduce) { .meter .fill { transition: none } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>ركّب محطتك!</h1>
+      <p class="sub">صيّاد الشمس · الوحدة 6 · مهد لابز</p>
+    </div>
+    <nav class="levels" id="levels" aria-label="المستويات"></nav>
+  </header>
+
+  <section class="mission" aria-live="polite">
+    <h2 id="mTitle"></h2>
+    <p id="mGoal"></p>
+    <button class="hintbtn" id="hintBtn" type="button">تلميح</button>
+  </section>
+
+  <p class="howto">انقر قطعة ثم قطعة أخرى لتربطهما بسلك · انقر السلك لحذفه</p>
+  <div class="stage">
+    <svg id="scene" viewBox="0 30 1000 610" role="img" aria-label="بيت بسطح فيه ألواح شمسية وقطع المحطة"></svg>
+  </div>
+
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+  <div class="bar">
+    <div class="controls">
+      <div class="clock" id="clock">10:00</div>
+      <button class="btn primary" id="playBtn" type="button">▶ شغّل اليوم</button>
+      <button class="btn" id="fastBtn" type="button" aria-pressed="false">سريع ×3</button>
+      <button class="btn" id="cloudBtn" type="button" aria-pressed="false">غيمة</button>
+      <button class="btn" id="resetBtn" type="button">يوم جديد</button>
+      <button class="btn" id="clearBtn" type="button">احذف الأسلاك</button>
+      <span class="panels" id="panelsBox" hidden>
+        <span>الألواح:</span>
+        <button class="btn" id="minusP" type="button" aria-label="لوح أقل">−</button>
+        <span class="n" id="nP">1</span>
+        <button class="btn" id="plusP" type="button" aria-label="لوح أكثر">+</button>
+      </span>
+    </div>
+    <div class="meters">
+      <div class="meter"><div class="k">إنتاج الألواح الآن</div><div class="v"><span id="vProd">0</span> <span class="u">وحدة/ساعة</span></div><div class="track"><div class="fill" id="fProd"></div></div></div>
+      <div class="meter"><div class="k">استهلاك الأجهزة الآن</div><div class="v"><span id="vUse">0</span> <span class="u">وحدة/ساعة</span></div><div class="track"><div class="fill" id="fUse" style="background:var(--teal)"></div></div></div>
+      <div class="meter"><div class="k">مخزون البطارية</div><div class="v" id="vBat">—</div><div class="track"><div class="fill" id="fBat" style="background:var(--good)"></div></div></div>
+    </div>
+  </div>
+
+  <div class="info" id="info"><b>ما وظيفة كل قطعة؟</b> انقر على أي قطعة لتقرأ دورها في المحطة.</div>
+</div>
+
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('scene');
+const $ = id => document.getElementById(id);
+
+// ---------- model ----------
+const TYPE_ORDER = ['panel', 'ctrl', 'batt', 'inv', 'lamp', 'fridge', 'pump'];
+const DEF = { panel: 'اللوح', ctrl: 'المنظم', batt: 'البطارية', inv: 'المحوّل', lamp: 'المصباح', fridge: 'الثلاجة', pump: 'المضخة' };
+const NAMES = { panel: 'لوح شمسي', ctrl: 'منظم الشحن', batt: 'بطارية', inv: 'محوّل', lamp: 'مصباح', fridge: 'ثلاجة', pump: 'مضخة ماء' };
+const ROLES = {
+  panel: 'يحوّل ضوء الشمس إلى كهرباء. يعطي أكثر حين تكون الشمس عالية، ولا يعطي شيئا في الليل.',
+  ctrl: 'عقل المحطة: يأخذ كهرباء الألواح ويوزّعها، ويحمي البطارية من الشحن الزائد ومن الفراغ الكامل.',
+  batt: 'تخزّن كهرباء النهار لنستعملها في الليل أو حين تختفي الشمس خلف الغيوم.',
+  inv: 'يحوّل كهرباء البطارية (12 فولت) إلى كهرباء مثل كهرباء المقبس (220 فولت) لتعمل بها الأجهزة الكبيرة.',
+  lamp: 'مصباح LED صغير يعمل بكهرباء الألواح أو البطارية مباشرة (12 فولت). يستهلك قليلا.',
+  fridge: 'تعمل بكهرباء المقبس (220 فولت)، فلا بد لها من محوّل. تشتغل طوال اليوم.',
+  pump: 'ترفع الماء من البئر لسقي الحديقة. تستهلك كثيرا وتعمل بـ220 فولت، فتحتاج محوّلا.'
+};
+const RATE = { lamp: 1, fridge: 0.4, pump: 2.5 };       // units per hour
+const PANEL_MAX = 2;                                     // units per hour at full sun
+const BATT_CAP = 12;
+const ALLOWED = new Set(['panel-ctrl', 'panel-lamp', 'ctrl-batt', 'ctrl-lamp', 'batt-lamp', 'batt-inv', 'ctrl-inv', 'inv-lamp', 'inv-fridge', 'inv-pump']);
+const POS = {
+  p1: [165, 262], p2: [270, 262], p3: [375, 262], p4: [480, 262], p5: [585, 262],
+  ctrl: [205, 405], batt: [205, 530], inv: [385, 470],
+  lamp: [545, 375], fridge: [545, 520], pump: [830, 540]
+};
+const LEVELS = [
+  { title: 'المستوى 1 · ضوء النهار', goal: 'أضئ المصباح في النهار بكهرباء الشمس.',
+    comps: ['ctrlless'], ids: ['lamp'], panels: 1, start: 10, batt: 0, demand: { lamp: [[6, 24]] }, kind: 'instant',
+    hints: ['المصباح يحتاج مصدرا للكهرباء. ما الذي يصنع الكهرباء من الضوء؟', 'اربط اللوح الشمسي بالمصباح مباشرة.', 'بعد أن يضيء، شغّل اليوم وانظر ماذا يحدث للمصباح عند الغروب.'],
+    win: 'رائع! اللوح يحوّل ضوء الشمس إلى كهرباء. شغّل اليوم الآن وراقب المصباح عند الغروب: ماذا يحدث؟ ولماذا؟' },
+  { title: 'المستوى 2 · ضوء الليل', goal: 'اجعل المصباح يضيء من 18:00 حتى منتصف الليل. شغّل اليوم من الصباح.',
+    ids: ['ctrl', 'batt', 'lamp'], panels: 1, start: 6, batt: 0, demand: { lamp: [[18, 24]] }, kind: 'day',
+    hints: ['في الليل لا ينتج اللوح شيئا. أين نخزّن كهرباء النهار؟', 'اللوح ← المنظم ← البطارية. ثم اربط المصباح بالبطارية أو بالمنظم.', 'شغّل اليوم من 6:00 حتى تمتلئ البطارية قبل الغروب.'],
+    win: 'ليلة مضيئة! البطارية خزّنت كهرباء النهار، فأضاء المصباح بعد غياب الشمس.' },
+  { title: 'المستوى 3 · ثلاجة لا تتوقف', goal: 'شغّل الثلاجة طوال اليوم، والمصباح من 18:00 حتى منتصف الليل.',
+    ids: ['ctrl', 'batt', 'inv', 'lamp', 'fridge'], panels: 1, start: 6, batt: 3, demand: { fridge: [[6, 24]], lamp: [[18, 24]] }, kind: 'day',
+    hints: ['الثلاجة لا تعمل بكهرباء البطارية مباشرة. تحتاج كهرباء مثل كهرباء المقبس.', 'أضف المحوّل: البطارية ← المحوّل ← الثلاجة.', 'لا تنس المصباح والبطارية والمنظم من المستوى السابق.'],
+    win: 'ممتاز! المحوّل جعل كهرباء البطارية صالحة للثلاجة، فبقيت باردة نهارا وليلا.' },
+  { title: 'المستوى 4 · بيت الجدة في الدوار', goal: 'تريد الجدة مضخة تسقي الحديقة من 10:00 إلى 16:00، وضوءا من 18:00 إلى منتصف الليل. استعمل أقل عدد من الألواح.',
+    ids: ['ctrl', 'batt', 'inv', 'lamp', 'pump'], panels: 1, maxPanels: 5, start: 6, batt: 3, demand: { pump: [[10, 16]], lamp: [[18, 24]] }, kind: 'day',
+    hints: ['المضخة تستهلك كثيرا في النهار، والمصباح يحتاج مخزونا لليل.', 'كل لوح يجب أن يُربط بالمنظم. جرّب لوحا واحدا، ثم لوحين.', 'جرّب أيضا زر الغيمة: هل يكفي عدد الألواح نفسه في يوم غائم؟'],
+    win: null }
+];
+
+let L = 0, level = LEVELS[0];
+let edges = new Map();           // key "a|b" (sorted) -> {a,b}
+let selected = null;
+let t = 10, playing = false, fast = false, cloud = false, nPanels = 1;
+let charge = 0, unmet = {}, failed = false, won = false, playedFromStart = false, hintIdx = 0;
+let flows = new Map(), state = {};
+let done = new Set();
+try { JSON.parse(localStorage.getItem('station-done') || '[]').forEach(x => done.add(x)); } catch (e) {}
+
+const typeOf = id => id[0] === 'p' && /^p\d$/.test(id) ? 'panel' : id;
+const key = (a, b) => [a, b].sort().join('|');
+const pairType = (a, b) => [typeOf(a), typeOf(b)].sort((x, y) => TYPE_ORDER.indexOf(x) - TYPE_ORDER.indexOf(y)).join('-');
+const ids = () => [...Array(nPanels)].map((_, i) => 'p' + (i + 1)).concat(level.ids);
+const sun = h => (h > 6 && h < 18) ? Math.sin(Math.PI * (h - 6) / 12) : 0;
+const fmt = h => { const hh = Math.floor(h) % 24, mm = Math.floor((h - Math.floor(h)) * 60); return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0'); };
+const wanted = (load, h) => (level.demand[load] || []).some(([a, b]) => h >= a && h < b);
+const has = (a, b) => edges.has(key(a, b));
+const hasType = (id, type) => [...edges.values()].some(e => (e.a === id && typeOf(e.b) === type) || (e.b === id && typeOf(e.a) === type));
+
+function badLinkMessage(a, b) {
+  const p = pairType(a, b), [x, y] = p.split('-');
+  if (x === y && x === 'panel') return 'ربط الألواح ببعضها يرفع الجهد كما في تجربتك! لكن هنا نربط كل لوح بالمنظم، وهو يجمعها.';
+  if (p === 'panel-batt') return 'لا نربط اللوح بالبطارية مباشرة: منظم الشحن يحميها من الشحن الزائد. ضع المنظم بينهما.';
+  if (p === 'panel-inv') return 'المحوّل يأخذ كهرباءه من البطارية أو المنظم، لا من اللوح مباشرة.';
+  if (['fridge', 'pump'].includes(y) && x !== 'inv') return DEF[y] + ' تعمل بكهرباء المقبس (220 فولت). تحتاج محوّلا بينها وبين ' + DEF[x] + '.';
+  if (['lamp', 'fridge', 'pump'].includes(x) && ['lamp', 'fridge', 'pump'].includes(y)) return 'الأجهزة لا تعطي كهرباء لبعضها. كل جهاز يحتاج مصدرا: لوحا أو بطارية أو محوّلا.';
+  return 'هذا الربط لا يفيد في المحطة. فكّر: من أين تأتي الكهرباء، وإلى أين تذهب؟';
+}
+
+// ---------- simulation ----------
+function compute(dt) {
+  const s = sun(t) * (cloud ? 0.35 : 1);
+  const panelIds = ids().filter(i => typeOf(i) === 'panel');
+  const toCtrl = panelIds.filter(p => level.ids.includes('ctrl') && has(p, 'ctrl'));
+  const toLamp = panelIds.filter(p => has(p, 'lamp'));
+  const prodCtrl = toCtrl.length * PANEL_MAX * s;
+  const prodDirect = toLamp.length * PANEL_MAX * s;
+  flows = new Map();
+  const on = { lamp: false, fridge: false, pump: false };
+  let use = 0, prodShown = 0, chargingFlow = 0;
+
+  // groups among ctrl/batt/inv
+  const hub = ['ctrl', 'batt', 'inv'].filter(x => level.ids.includes(x));
+  const seen = new Set(), groups = [];
+  for (const h of hub) {
+    if (seen.has(h)) continue;
+    const g = [h]; seen.add(h);
+    for (let i = 0; i < g.length; i++) for (const o of hub) if (!seen.has(o) && has(g[i], o)) { seen.add(o); g.push(o); }
+    groups.push(g);
+  }
+  const battCanCharge = groups.some(g => g.includes('ctrl') && g.includes('batt'));
+
+  for (const g of groups) {
+    const hasC = g.includes('ctrl'), hasB = g.includes('batt'), hasI = g.includes('inv');
+    const solar = hasC ? prodCtrl : 0;
+    if (hasC) prodShown += prodCtrl;
+    const loads = [];
+    if (level.ids.includes('lamp') && (g.some(n => n !== 'inv' && has(n, 'lamp')) || (hasI && has('inv', 'lamp')))) loads.push('lamp');
+    if (hasI && level.ids.includes('fridge') && has('inv', 'fridge')) loads.push('fridge');
+    if (hasI && level.ids.includes('pump') && has('inv', 'pump')) loads.push('pump');
+    let avail = solar + (hasB ? charge / Math.max(dt, 1e-6) : 0);
+    if (dt === 0) avail = solar + (hasB && charge > 0.01 ? 99 : 0);
+    let used = 0;
+    for (const ld of ['lamp', 'fridge', 'pump']) {
+      if (!loads.includes(ld) || !wanted(ld, t)) continue;
+      if (avail - used >= RATE[ld] - 1e-9) { used += RATE[ld]; on[ld] = true; }
+    }
+    use += used;
+    const net = solar - used;
+    if (hasB) {
+      if (net >= 0) { if (hasC && battCanCharge) { const add = Math.min(net * dt, BATT_CAP - charge); charge += add; chargingFlow = net; } }
+      else { charge = Math.max(0, charge + net * dt); chargingFlow = net; }
+    }
+    // flows for animation
+    for (const p of toCtrl) if (hasC) flows.set(key(p, 'ctrl'), { from: p, amt: PANEL_MAX * s });
+    if (hasB && hasC && has('ctrl', 'batt')) {
+      const f = hasB ? (net >= 0 ? (charge < BATT_CAP - 0.01 ? net : 0) : net) : 0;
+      if (Math.abs(f) > 0.01) flows.set(key('ctrl', 'batt'), { from: f > 0 ? 'ctrl' : 'batt', amt: Math.abs(f) });
+    }
+    const acUse = (on.fridge ? RATE.fridge : 0) + (on.pump ? RATE.pump : 0) + (on.lamp && has('inv', 'lamp') && !g.some(n => n !== 'inv' && has(n, 'lamp')) ? RATE.lamp : 0);
+    if (hasI && acUse > 0) {
+      const src = ['batt', 'ctrl'].find(n => g.includes(n) && has(n, 'inv'));
+      if (src) flows.set(key(src, 'inv'), { from: src, amt: acUse });
+      if (on.fridge) flows.set(key('inv', 'fridge'), { from: 'inv', amt: RATE.fridge });
+      if (on.pump) flows.set(key('inv', 'pump'), { from: 'inv', amt: RATE.pump });
+    }
+    if (on.lamp && loads.includes('lamp')) {
+      const src = ['batt', 'ctrl', 'inv'].find(n => g.includes(n) && has(n, 'lamp'));
+      if (src) flows.set(key(src, 'lamp'), { from: src, amt: RATE.lamp });
+    }
+  }
+  // lamp straight from a panel
+  if (toLamp.length && wanted('lamp', t) && prodDirect >= 0.6) {
+    if (!on.lamp) use += RATE.lamp;
+    on.lamp = true;
+    prodShown += prodDirect;
+    for (const p of toLamp) flows.set(key(p, 'lamp'), { from: p, amt: PANEL_MAX * s });
+  } else if (toLamp.length) prodShown += prodDirect;
+
+  state = { s, on, use, prod: prodShown, charging: chargingFlow, battCanCharge };
+  // unmet tracking
+  if (dt > 0) for (const ld of Object.keys(level.demand)) {
+    if (!level.ids.includes(ld)) continue;
+    if (wanted(ld, t) && !on[ld]) unmet[ld] = (unmet[ld] || 0) + dt;
+  }
+  return state;
+}
+
+function failureReason(ld) {
+  const name = NAMES[ld];
+  const connected = ld === 'lamp' ? (hasType('lamp', 'ctrl') || hasType('lamp', 'batt') || hasType('lamp', 'inv') || hasType('lamp', 'panel')) : has('inv', ld);
+  if (!connected) return 'لا يوجد سلك يوصل الكهرباء إلى ' + DEF[ld] + '.';
+  if ((ld === 'fridge' || ld === 'pump') && !(has('inv', 'batt') || has('inv', 'ctrl'))) return 'المحوّل نفسه لا يأخذ كهرباء. اربطه بالبطارية.';
+  if (!level.ids.includes('batt') || !(hasType(ld, 'batt') || has('inv', 'batt') || has('ctrl', 'batt'))) {
+    if (sun(t) === 0) return 'غابت الشمس عند ' + fmt(t) + ' ولا توجد بطارية تخزّن كهرباء النهار.';
+  }
+  if (!state.battCanCharge && (hasType(ld, 'batt') || has('inv', 'batt'))) return 'البطارية لم تُشحن: اربطها بالمنظم، واربط المنظم بالألواح.';
+  const cl = cloud ? ' في يوم غائم تنتج الألواح أقل، فتحتاج ألواحا أكثر.' : '';
+  if (charge <= 0.05) return 'فرغت البطارية عند ' + fmt(t) + '. ' + (nPanels === 1 ? 'لوح واحد لم ينتج ما يكفي.' : 'هذا العدد من الألواح لم ينتج ما يكفي.') + cl;
+  return 'لم تكفِ الكهرباء لتشغيل ' + DEF[ld] + ' عند ' + fmt(t) + '.' + cl;
+}
+
+// ---------- drawing ----------
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; }
+let gSky, gSun, gStars, gWires, gComps, skyRect, ground, sunG, compEls = {};
+
+function buildStatic() {
+  svg.innerHTML = '';
+  const defs = el('defs', {});
+  defs.innerHTML = `
+    <linearGradient id="skyDay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD0F2"/><stop offset="1" stop-color="#DDF1FA"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#FFD25A" stop-opacity=".9"/><stop offset="1" stop-color="#FFD25A" stop-opacity="0"/></radialGradient>
+    <pattern id="cells" width="22" height="16" patternUnits="userSpaceOnUse"><rect width="22" height="16" fill="#1F4E8C"/><path d="M22 0V16M0 16H22" stroke="#7FA6D6" stroke-width="1.2"/></pattern>`;
+  skyRect = el('rect', { x: 0, y: 0, width: 1000, height: 640, fill: '#BFE6F7' });
+  gStars = el('g', { opacity: 0 });
+  for (let i = 0; i < 40; i++) el('circle', { cx: (i * 263) % 1000, cy: 18 + (i * 97) % 200, r: i % 3 ? 1.6 : 2.4, fill: '#fff' }, gStars);
+  // sun path
+  el('path', { d: 'M80 240 Q500 -110 920 240', fill: 'none', stroke: '#fff', 'stroke-width': 2, 'stroke-dasharray': '4 8', opacity: .55 });
+  sunG = el('g', {});
+  el('circle', { r: 46, fill: 'url(#glow)' }, sunG);
+  el('circle', { r: 26, fill: '#FFB400', stroke: '#E2572B', 'stroke-width': 3 }, sunG);
+  const moon = el('g', { id: 'moon' }); el('circle', { cx: 880, cy: 70, r: 22, fill: '#F4F1DE' }, moon); el('circle', { cx: 892, cy: 62, r: 20, fill: '#18304D' }, moon);
+  window._moon = moon;
+  const cloudG = el('g', { id: 'cloudG', opacity: 0 });
+  [[420, 90], [500, 70], [580, 92], [470, 105], [545, 108]].forEach(([x, y]) => el('ellipse', { cx: x, cy: y, rx: 52, ry: 30, fill: '#E9EEF3' }, cloudG));
+  window._cloud = cloudG;
+  // ground + garden
+  ground = el('rect', { x: 0, y: 600, width: 1000, height: 40, fill: '#C9A46A' });
+  el('rect', { x: 660, y: 585, width: 340, height: 18, rx: 8, fill: '#6FB35A' });
+  // well
+  el('path', { d: 'M880 600 V560 H960 V600', fill: '#B8B1A4', stroke: '#5A5248', 'stroke-width': 3 });
+  el('ellipse', { cx: 920, cy: 560, rx: 40, ry: 9, fill: '#3E6E9A', stroke: '#5A5248', 'stroke-width': 3 });
+  // tree
+  el('rect', { x: 716, y: 500, width: 14, height: 90, fill: '#7A5532' });
+  el('circle', { cx: 723, cy: 480, r: 46, fill: '#4E9A46' });
+  // house: flat roof (Moroccan terrace)
+  el('rect', { x: 110, y: 300, width: 520, height: 300, fill: '#F6EAD3', stroke: '#8C6E4A', 'stroke-width': 4 });
+  el('rect', { x: 100, y: 286, width: 540, height: 18, fill: '#E9D8B6', stroke: '#8C6E4A', 'stroke-width': 4 });
+  el('path', { d: 'M110 330 H630', stroke: '#8C6E4A', 'stroke-width': 1.5, opacity: .35 });
+  el('rect', { x: 452, y: 470, width: 60, height: 130, rx: 30, fill: '#2E7D78', stroke: '#8C6E4A', 'stroke-width': 3 });
+  el('text', { x: 370, y: 350, 'text-anchor': 'middle', 'font-family': 'Cairo, sans-serif', 'font-weight': 700, 'font-size': 18, fill: '#8C6E4A', opacity: .7 }).textContent = 'داخل البيت';
+  gWires = el('g', {});
+  gComps = el('g', {});
+}
+
+function icon(type, g, id) {
+  const c = (tag, a) => el(tag, a, g);
+  if (type === 'panel') {
+    c('path', { d: 'M-48 18 L-30 -24 H48 L30 18 Z', fill: 'url(#cells)', stroke: '#12355B', 'stroke-width': 3 });
+    c('path', { d: 'M0 18 V34 M-14 34 H14', stroke: '#5A6B7C', 'stroke-width': 4 });
+  } else if (type === 'ctrl') {
+    c('rect', { x: -42, y: -30, width: 84, height: 60, rx: 8, fill: '#E7EEF5', stroke: '#12355B', 'stroke-width': 3 });
+    c('rect', { x: -30, y: -20, width: 60, height: 22, rx: 3, fill: '#173B5F' });
+    g._scr = c('text', { x: 0, y: -4, 'text-anchor': 'middle', 'font-family': 'Cairo,sans-serif', 'font-weight': 800, 'font-size': 13, fill: '#7CFFB0' });
+    c('circle', { cx: -18, cy: 16, r: 4, fill: '#2E9E5B' }); c('circle', { cx: 0, cy: 16, r: 4, fill: '#FFB400' }); c('circle', { cx: 18, cy: 16, r: 4, fill: '#C2412D' });
+  } else if (type === 'batt') {
+    c('rect', { x: -44, y: -28, width: 88, height: 56, rx: 7, fill: '#F2F5F8', stroke: '#12355B', 'stroke-width': 3 });
+    c('rect', { x: -30, y: -36, width: 14, height: 8, fill: '#12355B' }); c('rect', { x: 16, y: -36, width: 14, height: 8, fill: '#12355B' });
+    g._lvl = c('rect', { x: -38, y: -22, width: 0, height: 44, rx: 4, fill: '#2E9E5B' });
+    g._pct = c('text', { x: 0, y: 6, 'text-anchor': 'middle', 'font-family': 'Cairo,sans-serif', 'font-weight': 800, 'font-size': 15, fill: '#12355B' });
+  } else if (type === 'inv') {
+    c('rect', { x: -40, y: -30, width: 80, height: 60, rx: 8, fill: '#FFF3D6', stroke: '#12355B', 'stroke-width': 3 });
+    c('path', { d: 'M-26 0 q6.5 -16 13 0 t13 0 t13 0 t13 0', fill: 'none', stroke: '#E2572B', 'stroke-width': 3.5 });
+    c('text', { x: 0, y: 22, 'text-anchor': 'middle', 'font-family': 'Cairo,sans-serif', 'font-weight': 800, 'font-size': 11, fill: '#12355B' }).textContent = '12 ← 220';
+  } else if (type === 'lamp') {
+    c('path', { d: 'M0 -70 V-34', stroke: '#5A5248', 'stroke-width': 3 });
+    g._glow = c('circle', { r: 58, fill: 'url(#glow)', opacity: 0 });
+    g._bulb = c('path', { d: 'M-18 -6 A22 22 0 1 1 18 -6 Q10 6 10 16 H-10 Q-10 6 -18 -6 Z', fill: '#D9DEE3', stroke: '#12355B', 'stroke-width': 3 });
+    c('rect', { x: -10, y: 16, width: 20, height: 10, rx: 2, fill: '#7E8A96' });
+  } else if (type === 'fridge') {
+    c('rect', { x: -32, y: -50, width: 64, height: 100, rx: 8, fill: '#F7FAFC', stroke: '#12355B', 'stroke-width': 3 });
+    c('path', { d: 'M-32 -12 H32 M22 -38 V-22 M22 -2 V14', stroke: '#12355B', 'stroke-width': 3 });
+    g._snow = c('path', { d: 'M-8 26 h16 M0 18 v16 M-6 20 l12 12 M6 20 l-12 12', stroke: '#2C88D9', 'stroke-width': 2.5, opacity: 0 });
+  } else if (type === 'pump') {
+    c('rect', { x: -34, y: -18, width: 50, height: 42, rx: 8, fill: '#E2572B', stroke: '#12355B', 'stroke-width': 3 });
+    c('circle', { cx: -9, cy: 3, r: 10, fill: '#FFB400', stroke: '#12355B', 'stroke-width': 2 });
+    c('path', { d: 'M16 -6 H40 V-34 H-60', fill: 'none', stroke: '#5A6B7C', 'stroke-width': 7, 'stroke-linecap': 'round' });
+    g._drops = c('g', { opacity: 0 });
+    [[-70, -26], [-78, -10], [-86, 6]].forEach(([x, y]) => el('path', { d: `M${x} ${y} q-5 8 0 11 q5 -3 0 -11 Z`, fill: '#3C9BE0' }, g._drops));
+  }
+}
+
+function buildComps() {
+  gComps.innerHTML = ''; compEls = {};
+  const list = ids();
+  for (const id of list) {
+    const type = typeOf(id), [x, y] = POS[id];
+    const g = el('g', { class: 'hit', transform: `translate(${x} ${y})`, tabindex: 0, role: 'button', 'aria-label': NAMES[type] }, gComps);
+    const ring = el('circle', { class: 'ring', r: 58, fill: 'transparent', stroke: 'transparent', 'stroke-width': 3, 'stroke-dasharray': '6 6' }, g);
+    icon(type, g, id);
+    el('text', { class: 'lbl', y: type === 'panel' ? -36 : type === 'fridge' ? 72 : (type === 'lamp' ? 50 : 54), 'text-anchor': 'middle', 'font-family': 'Cairo,sans-serif', 'font-weight': 800, 'font-size': 17, fill: '#12355B', 'paint-order': 'stroke', stroke: '#FFFDF6', 'stroke-width': 5 }, g).textContent = NAMES[type];
+    g._ring = ring;
+    g.addEventListener('click', () => tapComp(id));
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapComp(id); } });
+    compEls[id] = g;
+  }
+}
+
+function wirePath(a, b) {
+  const [x1, y1] = POS[a], [x2, y2] = POS[b];
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - Math.min(60, Math.abs(x1 - x2) * .18 + 18);
+  return `M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`;
+}
+function drawWires() {
+  gWires.innerHTML = '';
+  for (const [k, e] of edges) {
+    const d = wirePath(e.a, e.b);
+    const g = el('g', { class: 'hit' }, gWires);
+    el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 26 }, g);
+    el('path', { d, fill: 'none', stroke: '#12355B', 'stroke-width': 6, 'stroke-linecap': 'round' }, g);
+    const fl = el('path', { d, fill: 'none', stroke: '#FFC233', 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-dasharray': '2 16', opacity: 0 }, g);
+    e.flowEl = fl; e.len = fl.getTotalLength(); e.off = 0;
+    g.addEventListener('click', ev => { ev.stopPropagation(); edges.delete(k); drawWires(); say('حُذف السلك.'); refresh(); });
+  }
+}
+
+// ---------- interaction ----------
+function tapComp(id) {
+  const type = typeOf(id);
+  showInfo(type);
+  if (!selected) { selected = id; markSel(); return; }
+  if (selected === id) { selected = null; markSel(); return; }
+  const a = selected, b = id; selected = null; markSel();
+  const k = key(a, b);
+  if (edges.has(k)) { edges.delete(k); drawWires(); say('حُذف السلك بين ' + NAMES[typeOf(a)] + ' و' + NAMES[typeOf(b)] + '.'); refresh(); return; }
+  if (!ALLOWED.has(pairType(a, b))) { say(badLinkMessage(a, b), 'bad'); return; }
+  edges.set(k, { a, b }); drawWires();
+  say('سلك جديد: ' + NAMES[typeOf(a)] + ' ↔ ' + NAMES[typeOf(b)] + '.');
+  refresh();
+}
+function markSel() { for (const id in compEls) compEls[id]._ring.setAttribute('stroke', id === selected ? '#E2572B' : 'transparent'); }
+function showInfo(type) { $('info').innerHTML = `<b>${NAMES[type]}:</b> ${ROLES[type]}`; }
+function say(text, kind) { const m = $('msg'); m.className = 'msg' + (kind ? ' ' + kind : ''); m.innerHTML = text; }
+
+// ---------- render loop ----------
+function paintScene() {
+  const h = t, s = sun(h);
+  const day = Math.max(0, Math.min(1, s * 3));
+  const lerp = (a, b, k) => Math.round(a + (b - a) * k);
+  const night = [24, 48, 77], dayC = cloud ? [184, 200, 214] : [191, 230, 247];
+  const col = night.map((v, i) => lerp(v, dayC[i], day));
+  skyRect.setAttribute('fill', `rgb(${col})`);
+  gStars.setAttribute('opacity', 1 - day);
+  window._moon.setAttribute('opacity', h >= 19 ? Math.min(1, (h - 19)) : 0);
+  window._cloud.setAttribute('opacity', cloud ? .95 : 0);
+  if (h > 6 && h < 18) { const k = (h - 6) / 12, x = 80 + 840 * k; const y = 240 - 4 * 175 * k * (1 - k); sunG.setAttribute('transform', `translate(${x} ${y})`); sunG.setAttribute('opacity', 1); }
+  else sunG.setAttribute('opacity', 0);
+  ground.setAttribute('fill', day > .3 ? '#C9A46A' : '#6E5B3F');
+  // components
+  const on = state.on || {};
+  for (const id in compEls) {
+    const g = compEls[id], type = typeOf(id);
+    if (type === 'lamp') { g._glow.setAttribute('opacity', on.lamp ? 1 : 0); g._bulb.setAttribute('fill', on.lamp ? '#FFD84D' : '#D9DEE3'); }
+    if (type === 'fridge') g._snow.setAttribute('opacity', on.fridge ? 1 : 0);
+    if (type === 'pump') g._drops.setAttribute('opacity', on.pump ? 1 : 0);
+    if (type === 'batt') { const k = charge / BATT_CAP; g._lvl.setAttribute('width', 76 * k); g._lvl.setAttribute('fill', k > .5 ? '#2E9E5B' : k > .2 ? '#FFB400' : '#C2412D'); g._pct.textContent = Math.round(k * 100) + '%'; }
+    if (type === 'ctrl') g._scr.textContent = state.charging > 0.01 ? 'شحن ▲' : state.charging < -0.01 ? 'تفريغ ▼' : (state.prod > 0 ? 'جاهز' : 'ليل');
+  }
+  $('clock').textContent = fmt(Math.min(t, 23.99));
+  const prod = state.prod || 0, use = state.use || 0;
+  $('vProd').textContent = prod.toFixed(1); $('fProd').style.width = Math.min(100, prod / 6 * 100) + '%';
+  $('vUse').textContent = use.toFixed(1); $('fUse').style.width = Math.min(100, use / 4 * 100) + '%';
+  if (level.ids.includes('batt')) { $('vBat').textContent = Math.round(charge / BATT_CAP * 100) + '%'; $('fBat').style.width = (charge / BATT_CAP * 100) + '%'; }
+  else { $('vBat').textContent = 'لا توجد'; $('fBat').style.width = '0%'; }
+}
+function animateFlows(dtReal) {
+  for (const [k, e] of edges) {
+    const f = flows.get(k);
+    if (!f || f.amt < 0.02) { e.flowEl.setAttribute('opacity', 0); continue; }
+    e.flowEl.setAttribute('opacity', 1);
+    const dir = f.from === e.a ? -1 : 1;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) e.off += dir * dtReal * (30 + f.amt * 45);
+    e.flowEl.setAttribute('stroke-dashoffset', e.off.toFixed(1));
+  }
+}
+
+let last = performance.now();
+function loop(now) {
+  const dtReal = Math.min(0.1, (now - last) / 1000); last = now;
+  if (playing && !failed) {
+    const hoursPerSec = fast ? 2.4 : 0.8;
+    let remain = dtReal * hoursPerSec;
+    while (remain > 0 && t < 24) { const step = Math.min(remain, 0.05, 24 - t); t += step; remain -= step; compute(step); checkDay(); if (failed || won) break; }
+    if (t >= 24 - 1e-6) { t = 24; endOfDay(); }
+  } else compute(0);
+  if (level.kind === 'instant') checkInstant();
+  paintScene(); animateFlows(dtReal);
+  requestAnimationFrame(loop);
+}
+
+// ---------- goals ----------
+function checkInstant() {
+  if (!won && state.on && state.on.lamp && sun(t) > 0) { won = true; markDone(); say('<b>نجحت!</b> ' + level.win, 'good'); }
+}
+function checkDay() {
+  if (level.kind !== 'day' || !playedFromStart) return;
+  for (const ld of Object.keys(unmet)) if (unmet[ld] > 0.2) { failed = true; playing = false; setPlay(); say('<b>انقطعت الكهرباء!</b> ' + failureReason(ld) + ' اضغط «يوم جديد» وجرّب من جديد.', 'bad'); return; }
+}
+function endOfDay() {
+  playing = false; setPlay();
+  if (level.kind === 'instant') { if (!won) say('انتهى اليوم. هل لاحظت أن المصباح انطفأ مع الغروب؟ اللوح لا ينتج شيئا في الليل.'); else say('انتهى اليوم. المصباح الموصول باللوح وحده ينطفئ مع الغروب: نحتاج طريقة لنخزّن كهرباء النهار. هذا هو المستوى 2!', 'good'); return; }
+  if (failed) return;
+  if (!playedFromStart) { say('شغّل اليوم من بدايته (اضغط «يوم جديد») لنتحقق من المهمة.'); return; }
+  won = true; markDone();
+  if (L === 3) {
+    const best = cloud ? 5 : 2, stars = nPanels <= best ? '★★★' : '★★';
+    const extra = nPanels > best ? ' هل تستطيع النجاح بألواح أقل؟' : !cloud ? ' جرّب الآن يوما غائما: هل يكفي لوحان؟' : ' في الغيم نحتاج ألواحا أكثر، ولهذا تُركّب المحطات الحقيقية ألواحا إضافية احتياطا.';
+    const nTxt = nPanels === 2 ? 'لوحين' : nPanels + ' ألواح';
+    say(`<b>${stars} الجدة سعيدة!</b> سقت المضخة الحديقة وأضاء المصباح حتى منتصف الليل باستعمال ${nTxt}${cloud ? '، في يوم غائم' : ''}.${extra}`, 'good');
+  } else say('<b>نجحت!</b> ' + level.win, 'good');
+}
+function markDone() { done.add(L); try { localStorage.setItem('station-done', JSON.stringify([...done])); } catch (e) {} buildLevelNav(); }
+
+// ---------- controls ----------
+function setPlay() { $('playBtn').textContent = playing ? '⏸ أوقف' : '▶ شغّل اليوم'; }
+function newDay() {
+  t = level.start; charge = level.batt; unmet = {}; failed = false; won = level.kind === 'instant' ? won && false : false; playing = false; playedFromStart = true; setPlay();
+}
+$('playBtn').onclick = () => {
+  if (failed || t >= 24) newDay();
+  if (t <= level.start + 1e-6) playedFromStart = true;
+  playing = !playing; setPlay();
+  if (playing && !won) say(level.kind === 'day' ? 'اليوم يجري… راقب البطارية والأجهزة.' : 'اليوم يجري… راقب المصباح.');
+};
+$('fastBtn').onclick = () => { fast = !fast; $('fastBtn').setAttribute('aria-pressed', fast); };
+$('cloudBtn').onclick = () => { cloud = !cloud; $('cloudBtn').setAttribute('aria-pressed', cloud); say(cloud ? 'يوم غائم: الألواح تنتج ثلث ما تنتجه في الشمس تقريبا.' : 'عادت الشمس.'); };
+$('resetBtn').onclick = () => { newDay(); won = false; say('يوم جديد يبدأ عند ' + fmt(level.start) + '. اضغط «شغّل اليوم».'); };
+$('clearBtn').onclick = () => { edges.clear(); drawWires(); newDay(); won = false; say('حُذفت كل الأسلاك.'); };
+$('hintBtn').onclick = () => { say('<b>تلميح:</b> ' + level.hints[hintIdx % level.hints.length]); hintIdx++; };
+$('minusP').onclick = () => setPanels(nPanels - 1);
+$('plusP').onclick = () => setPanels(nPanels + 1);
+function setPanels(n) {
+  n = Math.max(1, Math.min(level.maxPanels || 1, n)); if (n === nPanels) return;
+  nPanels = n; $('nP').textContent = n;
+  for (const [k, e] of [...edges]) if (!ids().includes(e.a) || !ids().includes(e.b)) edges.delete(k);
+  buildComps(); drawWires(); newDay(); won = false;
+  say(n + (n === 1 ? ' لوح على السطح.' : n === 2 ? ' لوحان على السطح.' : ' ألواح على السطح.') + ' اربط كل لوح بالمنظم.');
+}
+function refresh() { if (level.kind === 'day' && (t > level.start + 1e-6)) { /* wiring changed mid-day */ } }
+
+function buildLevelNav() {
+  const nav = $('levels'); nav.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'lv'; b.setAttribute('aria-pressed', i === L);
+    b.innerHTML = `${i + 1}${done.has(i) ? '<span class="done">✓</span>' : ''}`; b.setAttribute('aria-label', lv.title + (done.has(i) ? ' (منجز)' : ''));
+    b.onclick = () => loadLevel(i); nav.appendChild(b);
+  });
+}
+function loadLevel(i) {
+  L = i; level = LEVELS[i]; edges.clear(); selected = null; nPanels = level.panels; hintIdx = 0; won = false;
+  $('nP').textContent = nPanels; $('panelsBox').hidden = !level.maxPanels;
+  $('mTitle').textContent = level.title; $('mGoal').textContent = level.goal;
+  buildComps(); drawWires(); newDay(); playedFromStart = level.kind === 'day';
+  buildLevelNav();
+  say(i === 0 ? 'ابدأ: انقر على اللوح الشمسي، ثم على المصباح.' : 'اربط القطع، ثم اضغط «شغّل اليوم» لتجرّب يوما كاملا من ' + fmt(level.start) + '.');
+  try { localStorage.setItem('station-level', i); } catch (e) {}
+}
+
+buildStatic();
+let startLevel = 0; try { startLevel = +(localStorage.getItem('station-level') || 0) || 0; } catch (e) {}
+loadLevel(Math.min(3, Math.max(0, startLevel)));
+requestAnimationFrame(loop);
+})();
+</script>
+
+<a href="../u6.html" style="position:fixed;z-index:50;top:calc(10px + env(safe-area-inset-top,0px));left:max(10px,env(safe-area-inset-left,0px));background:#12355B;color:#FFF6E0;font:700 14px Cairo,Tajawal,system-ui,sans-serif;text-decoration:none;padding:6px 14px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.2)">→ المحطة 6</a>
+</body>
+</html>
