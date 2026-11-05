@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>مختبر اللوح</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Layout: a lab bench — the sun-and-panel scene beside the panel's face (36 tappable cells), meters under them, missions as a checklist. Kit identity: navy, sun amber, teal. */
+:root {
+  --bg: #FFF6E0; --panel: #FFFDF6; --ink: #12355B; --ink-soft: #3C5875; --line: rgba(18,53,91,.22);
+  --sun: #FFB400; --sun-deep: #E2572B; --teal: #1FA3A3; --good: #2E9E5B; --bad: #C2412D; --chip: #F3E7C7; --btn-ink: #FFF6E0;
+  --f-display: 'Cairo', 'Tajawal', system-ui, sans-serif; --f-body: 'Tajawal', 'Cairo', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1E31; --panel: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --chip: #1D3757; --btn-ink: #0E1E31; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1E31; --panel: #142A43; --ink: #EAF1F8; --ink-soft: #A9BDD2; --line: rgba(234,241,248,.18);
+  --sun: #FFC233; --sun-deep: #FF7A4D; --teal: #3CC2C2; --good: #49C27A; --bad: #FF6B57; --chip: #1D3757; --btn-ink: #0E1E31; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; direction: rtl;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 32px }
+.wrap { max-width: 1060px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 4vw, 34px); margin: 0; line-height: 1.2 }
+.sub { color: var(--ink-soft); font-size: 15px; margin: 2px 0 0 }
+.intro { background: var(--sun); color: #12355B; border-radius: 18px; padding: 12px 18px; font-size: 16px; font-weight: 500 }
+.intro b { font-family: var(--f-display) }
+.bench { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px }
+.card { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
+.card h2 { font-family: var(--f-display); font-weight: 800; font-size: 19px; margin: 0 }
+.hint { font-size: 14px; color: var(--ink-soft); margin: 0 }
+svg { display: block; width: 100%; height: auto; user-select: none }
+.ctl { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-weight: 700; font-size: 15px }
+.ctl output { font-family: var(--f-display); font-variant-numeric: tabular-nums; min-width: 84px; text-align: center }
+input[type=range] { width: 100%; accent-color: var(--sun-deep); height: 28px; direction: ltr }
+.tools { display: flex; flex-wrap: wrap; gap: 8px }
+.btn { font-family: var(--f-display); font-weight: 700; font-size: 15px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 12px; padding: 6px 12px; cursor: pointer; min-height: 40px }
+.btn[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff }
+.btn:focus-visible, input:focus-visible, .cell:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px }
+.cell { cursor: pointer }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
+.meter { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 8px 12px; min-width: 0; display: flex; flex-direction: column; gap: 2px }
+.meter .k { font-size: 13.5px; color: var(--ink-soft); font-weight: 700 }
+.meter .v { font-family: var(--f-display); font-weight: 800; font-size: 24px; font-variant-numeric: tabular-nums; line-height: 1.25 }
+.meter .u { font-size: 13px; color: var(--ink-soft) }
+.track { height: 9px; background: var(--chip); border-radius: 999px; overflow: hidden }
+.fill { height: 100%; width: 0; border-radius: 999px; background: var(--sun) }
+.vm { background: #2B2B2B; color: #FF4A3A; font-family: 'Courier New', monospace; font-weight: 700; font-size: 26px; border-radius: 8px; padding: 0 10px; align-self: flex-start; direction: ltr; min-width: 92px; text-align: center }
+.msg { min-height: 50px; border-radius: 14px; padding: 12px 16px; font-size: 16px; font-weight: 500; background: var(--chip) }
+.msg.good { background: var(--good); color: #fff }
+.msg b { font-family: var(--f-display) }
+.missions { display: flex; flex-direction: column; gap: 8px; list-style: none; margin: 0; padding: 0 }
+.missions li { display: flex; gap: 10px; align-items: flex-start; background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 8px 12px }
+.missions li .st { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink); flex: none; display: flex; align-items: center; justify-content: center; font-family: var(--f-display); font-weight: 800 }
+.missions li.done { border-color: var(--good) }
+.missions li.done .st { background: var(--good); border-color: var(--good); color: #fff }
+.missions li .t { font-family: var(--f-display); font-weight: 800 }
+.missions li .d { font-size: 14.5px }
+.missions li .tag { font-size: 12px; font-weight: 700; color: var(--sun-deep); margin-inline-start: 6px }
+.end { background: var(--ink); color: var(--bg); border-radius: 18px; padding: 12px 18px; display: flex; flex-direction: column; gap: 4px }
+.end b { font-family: var(--f-display); color: var(--sun); font-size: 18px }
+.end ol { margin: 0; padding-inline-start: 22px }
+@media (max-width: 760px) { .bench { grid-template-columns: 1fr } }
+@media (max-width: 460px) { .meters { gap: 6px } .meter { padding: 6px 8px } .meter .v { font-size: 19px } .vm { font-size: 20px; min-width: 70px } .meter .k { font-size: 12px } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div><h1>مختبر اللوح</h1><p class="sub">صيّاد الشمس · الوحدة 5 · مهد لابز</p></div>
+  </header>
+  <p class="intro"><b>جرّب ما لا تراه في التجربة:</b> حرّك الشمس وأمِل اللوح، وانقر على الخلايا لتغطيها بالكرتون. راقب الكهرباء وهي تجري في سلسلة الخلايا، والمصباح والفولتمتر.</p>
+
+  <div class="bench">
+    <section class="card" aria-labelledby="h-side">
+      <h2 id="h-side">الشمس واللوح</h2>
+      <svg id="side" viewBox="0 0 520 300" role="img" aria-label="منظر جانبي: الشمس في السماء واللوح المائل"></svg>
+      <div class="ctl"><label for="time">الساعة</label><input id="time" type="range" min="6.5" max="17.5" step="0.25" value="10"><output id="timeOut">12:00</output></div>
+      <div class="ctl"><label for="tilt">ميل اللوح</label><input id="tilt" type="range" min="-80" max="80" step="1" value="20"><output id="tiltOut">20° غربا</output></div>
+      <p class="hint">الميل 0° يعني أن اللوح ينظر إلى السماء مباشرة. حرّكه نحو الشمس.</p>
+    </section>
+    <section class="card" aria-labelledby="h-face">
+      <h2 id="h-face">وجه اللوح: 36 خلية في سلسلة</h2>
+      <svg id="face" viewBox="0 0 460 330" role="group" aria-label="خلايا اللوح، انقر خلية لتغطيتها"></svg>
+      <div class="tools">
+        <button class="btn" id="clear" type="button">أزل كل الظل</button>
+        <button class="btn" id="quarter" type="button">غطِّ الربع</button>
+        <button class="btn" id="half" type="button">غطِّ النصف</button>
+        <button class="btn" id="bypass" type="button" aria-pressed="false">صمامات التجاوز (للكبار)</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="meters">
+    <div class="meter"><div class="k">الكهرباء التي تجري (التيار)</div><div class="v"><span id="vI">0</span><span class="u"> %</span></div><div class="track"><div class="fill" id="fI"></div></div></div>
+    <div class="meter"><div class="k">الفولتمتر (والمصباح موصول)</div><div class="vm" id="vV">0.0</div></div>
+    <div class="meter"><div class="k">لمعان المصباح</div><div class="v"><span id="vL">0</span><span class="u"> من 3</span></div><svg viewBox="0 0 160 30" aria-hidden="true"><g id="leds"></g></svg></div>
+  </div>
+
+  <div class="msg" id="msg" role="status" aria-live="polite">ابدأ: حرّك «ميل اللوح» حتى يواجه الشمس.</div>
+
+  <section class="card" aria-labelledby="h-m">
+    <h2 id="h-m">مهماتك في المختبر</h2>
+    <ul class="missions" id="missions"></ul>
+  </section>
+
+  <section class="end">
+    <b>عُد إلى دفترك</b>
+    <ol>
+      <li>لماذا أطفأت خلية واحدة مغطاة اللوح كله تقريبا؟</li>
+      <li>لماذا تتحرك مرايا نور طوال النهار؟</li>
+      <li>أين تضع لوحا على سطح بيتكم ليبتعد عن كل ظل؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const el = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+const ROWS = 6, COLS = 6;
+const shaded = new Array(36).fill(false);
+let bypass = false;
+const done = new Set();
+try { JSON.parse(localStorage.getItem('lab5-done') || '[]').forEach(x => done.add(x)); } catch (e) {}
+
+// ---------- physics (simplified for children) ----------
+const sunS = h => Math.max(0, Math.sin(Math.PI * (h - 6) / 12));
+function compute() {
+  const h = +$('time').value, tilt = +$('tilt').value;
+  const s = sunS(h), G = s > 0 ? Math.pow(s, 0.35) : 0;
+  const sunAng = 180 - (h - 6) / 12 * 180;         // direction to sun, degrees from +x (east on the left)
+  const normAng = 90 - tilt;                         // panel normal
+  const cosI = Math.max(0, Math.cos((sunAng - normAng) * Math.PI / 180));
+  const light = shaded.map(sh => G * (sh ? 0.06 : 0.9 * cosI + 0.1));
+  let k;
+  if (!bypass) k = Math.min(...light);
+  else { let sum = 0; for (let g = 0; g < 3; g++) sum += Math.min(...light.slice(g * 12, g * 12 + 12)); k = sum / 3; }
+  const maxK = 1.0;
+  const kk = Math.min(1, k / maxK);
+  const V = kk < 0.02 ? kk / 0.02 * 3.4 : Math.min(6.2, 4.6 + 1.6 * Math.sqrt(kk));
+  const L = kk >= 0.7 ? 3 : kk >= 0.35 ? 2 : kk >= 0.08 ? 1 : 0;
+  return { h, tilt, s, G, cosI, light, k: kk, V, L, sunAng, normAng };
+}
+
+// ---------- side view ----------
+const side = $('side');
+side.innerHTML = '<rect width="520" height="300" fill="#BFE6F7"/><path d="M60 250 A200 200 0 0 1 460 250" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 7" opacity=".8"/><rect y="250" width="520" height="50" fill="#C9A46A"/>';
+el('text', { x: 40, y: 280, 'font-size': 15, 'font-weight': 700, fill: '#12355B', 'font-family': 'Cairo,sans-serif', 'text-anchor': 'middle' }, side).textContent = 'شرق';
+el('text', { x: 480, y: 280, 'font-size': 15, 'font-weight': 700, fill: '#12355B', 'font-family': 'Cairo,sans-serif', 'text-anchor': 'middle' }, side).textContent = 'غرب';
+const rays = el('g', {}, side);
+const sunG = el('g', {}, side);
+el('circle', { r: 30, fill: '#FFD25A', opacity: .45 }, sunG); el('circle', { r: 18, fill: '#FFB400', stroke: '#E2572B', 'stroke-width': 3 }, sunG);
+el('rect', { x: 255, y: 205, width: 10, height: 45, fill: '#5A6B7C' }, side);
+const panelG = el('g', {}, side);
+el('rect', { x: -70, y: -8, width: 140, height: 16, rx: 2, fill: '#1F4E8C', stroke: '#12355B', 'stroke-width': 2.5 }, panelG);
+for (let i = 1; i < 6; i++) el('line', { x1: -70 + i * 23.3, y1: -8, x2: -70 + i * 23.3, y2: 8, stroke: '#7FA6D6', 'stroke-width': 1 }, panelG);
+const normal = el('line', { x1: 0, y1: 0, x2: 0, y2: -46, stroke: '#E2572B', 'stroke-width': 2.5, 'stroke-dasharray': '4 4' }, panelG);
+const angTxt = el('text', { x: 260, y: 284, 'font-size': 16, 'font-weight': 800, fill: '#12355B', 'font-family': 'Cairo,sans-serif', 'text-anchor': 'middle' }, side);
+
+// ---------- face ----------
+const face = $('face');
+const CW = 64, CH = 44, X0 = 38, Y0 = 20;
+el('rect', { x: X0 - 10, y: Y0 - 10, width: COLS * CW + 20, height: ROWS * CH + 20, rx: 8, fill: '#D9DEE3', stroke: '#12355B', 'stroke-width': 3 }, face);
+const cells = [];
+const order = [];                       // snake order of cell indices
+for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) order.push(r * COLS + (r % 2 ? COLS - 1 - c : c));
+for (let i = 0; i < 36; i++) {
+  const r = Math.floor(i / COLS), c = i % COLS;
+  const g = el('g', { class: 'cell', tabindex: 0, role: 'button', 'aria-pressed': 'false', 'aria-label': `خلية ${i + 1}` }, face);
+  const rc = el('rect', { x: X0 + c * CW + 2, y: Y0 + r * CH + 2, width: CW - 4, height: CH - 4, rx: 3, fill: '#1F4E8C' }, g);
+  el('line', { x1: X0 + c * CW + CW / 2, y1: Y0 + r * CH + 4, x2: X0 + c * CW + CW / 2, y2: Y0 + (r + 1) * CH - 4, stroke: '#7FA6D6', 'stroke-width': 1 }, g);
+  const cover = el('rect', { x: X0 + c * CW + 2, y: Y0 + r * CH + 2, width: CW - 4, height: CH - 4, rx: 3, fill: '#C8A27A', stroke: '#8C6E4A', 'stroke-width': 2, opacity: 0 }, g);
+  const toggle = () => { shaded[i] = !shaded[i]; update(true); };
+  g.addEventListener('click', toggle);
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  cells.push({ g, rc, cover });
+}
+// series path through the cells
+let d = '';
+order.forEach((idx, n) => { const r = Math.floor(idx / COLS), c = idx % COLS; const x = X0 + c * CW + CW / 2, y = Y0 + r * CH + CH / 2; d += (n ? ' L' : 'M') + x + ' ' + y; });
+el('path', { d, fill: 'none', stroke: '#0B2D57', 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: .55, 'pointer-events': 'none' }, face);
+const flow = el('path', { d, fill: 'none', stroke: '#FFC233', 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-dasharray': '2 14', 'pointer-events': 'none' }, face);
+const groupLines = el('g', { opacity: 0, 'pointer-events': 'none' }, face);
+[2, 4].forEach(r => el('line', { x1: X0 - 6, y1: Y0 + r * CH, x2: X0 + COLS * CW + 6, y2: Y0 + r * CH, stroke: '#E2572B', 'stroke-width': 3, 'stroke-dasharray': '8 5' }, groupLines));
+el('text', { x: 18, y: Y0 + 12, 'font-size': 13, 'font-weight': 800, fill: '#C2412D', 'font-family': 'Cairo,sans-serif', 'text-anchor': 'middle' }, face).textContent = '+';
+el('text', { x: 18, y: Y0 + ROWS * CH - 4, 'font-size': 15, 'font-weight': 800, fill: '#12355B', 'font-family': 'Cairo,sans-serif', 'text-anchor': 'middle' }, face).textContent = '−';
+
+// LEDs
+const ledG = $('leds'); const ledEls = [0, 1, 2].map(i => el('circle', { cx: 30 + i * 50, cy: 15, r: 10, fill: '#D9DEE3', stroke: '#12355B', 'stroke-width': 2 }, ledG));
+
+// ---------- missions ----------
+const MISSIONS = [
+  { id: 'max', t: 'أسطع ما يمكن', d: 'دون أي ظل، أمِل اللوح حتى يصل التيار إلى 95% على الأقل.', test: r => r.k >= 0.95 && !shaded.some(Boolean) },
+  { id: 'one', t: 'خلية واحدة فقط', d: 'غطِّ خلية واحدة بالكرتون والشمس عالية. ماذا حدث للتيار؟', test: r => shaded.filter(Boolean).length === 1 && r.G > 0.9 && r.k < 0.15, say: 'خلية واحدة أطفأت اللوح كله تقريبا! الخلايا موصولة في سلسلة، والكهرباء لا تجري أسرع من أضعف حلقة.' },
+  { id: 'half', t: 'نصف أم واحدة؟', d: 'غطِّ نصف اللوح. هل نقصت الكهرباء أكثر مما نقصت بخلية واحدة؟', test: r => shaded.filter(Boolean).length >= 18 && !bypass && r.G > 0.9, say: 'مفاجأة: نصف اللوح المغطى يعطي تقريبا ما تعطيه خلية واحدة مغطاة. في السلسلة، الظل الصغير خطير مثل الكبير.' },
+  { id: 'morning', t: 'شمس الصباح', d: 'اجعل الساعة 8:00، ثم ابحث عن أفضل ميل. هل هو نفسه وقت الظهر؟', test: r => r.h <= 8.25 && r.cosI > 0.97 && !shaded.some(Boolean), say: 'في الصباح يجب أن يميل اللوح نحو الشرق. أفضل اتجاه يتغير مع الساعة، ولهذا تتحرك مرايا نور لتتبع الشمس.' },
+  { id: 'bypass', t: 'لوح ذكي (للكبار)', d: 'شغّل «صمامات التجاوز» ثم غطِّ خلية واحدة. كم بقي من الكهرباء؟', test: r => bypass && shaded.filter(Boolean).length === 1 && r.G > 0.9 && r.k > 0.5, say: 'الألواح الكبيرة مقسومة إلى ثلاثة أجزاء، ولكل جزء ممر جانبي. الخلية المظلمة تُطفئ جزءها فقط، فيبقى ثلثا الكهرباء.' }
+];
+const ul = $('missions');
+const mEls = MISSIONS.map((m, i) => { const li = document.createElement('li'); li.innerHTML = `<span class="st">${i + 1}</span><div><div class="t">${m.t}${m.id === 'bypass' ? '<span class="tag">12 سنة فما فوق</span>' : ''}</div><div class="d">${m.d}</div></div>`; ul.appendChild(li); return li; });
+function paintMissions() { MISSIONS.forEach((m, i) => { const ok = done.has(m.id); mEls[i].classList.toggle('done', ok); mEls[i].querySelector('.st').textContent = ok ? '✓' : String(i + 1); }); }
+
+// ---------- render ----------
+const fmt = h => `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}`;
+let speed = 0, off = 0;
+function update(userTouched) {
+  const r = compute();
+  $('timeOut').textContent = fmt(r.h); $('tiltOut').textContent = Math.abs(r.tilt) + '°' + (r.tilt > 0 ? ' غربا' : r.tilt < 0 ? ' شرقا' : '');
+  // side scene
+  const a = r.sunAng * Math.PI / 180; const sx = 260 + 200 * Math.cos(a), sy = 250 - 200 * Math.sin(a) * 0.95;
+  sunG.setAttribute('transform', `translate(${sx} ${sy})`);
+  panelG.setAttribute('transform', `translate(260 205) rotate(${r.tilt})`);
+  rays.innerHTML = '';
+  for (let i = -2; i <= 2; i++) { const px = 260 + i * 26 * Math.cos(r.tilt * Math.PI / 180), py = 205 + i * 26 * Math.sin(r.tilt * Math.PI / 180); el('line', { x1: sx, y1: sy, x2: px, y2: py, stroke: '#E0A800', 'stroke-width': 2, 'stroke-dasharray': '5 5', opacity: r.cosI > 0 ? 0.35 + 0.6 * r.cosI : 0.15 }, rays); }
+  angTxt.textContent = r.cosI > 0.97 ? 'اللوح يواجه الشمس تماما!' : r.cosI > 0.7 ? 'قريب… أمِله أكثر نحو الشمس' : r.cosI > 0.2 ? 'الشمس تضرب اللوح بزاوية مائلة' : 'اللوح لا يكاد يرى الشمس';
+  // face
+  cells.forEach((c, i) => { c.cover.setAttribute('opacity', shaded[i] ? 1 : 0); c.g.setAttribute('aria-pressed', shaded[i]); const lit = r.light[i] / Math.max(r.G, 0.01); c.rc.setAttribute('fill', shaded[i] ? '#1F4E8C' : `rgb(${31 + 40 * lit},${78 + 40 * lit},${140 + 60 * lit})`); });
+  groupLines.setAttribute('opacity', bypass ? 1 : 0);
+  speed = r.k;
+  flow.setAttribute('opacity', r.k > 0.02 ? 1 : 0.15);
+  // meters
+  $('vI').textContent = Math.round(r.k * 100); $('fI').style.width = (r.k * 100) + '%';
+  $('vV').textContent = r.V.toFixed(1); $('vL').textContent = r.L;
+  ledEls.forEach((e, i) => e.setAttribute('fill', i < r.L ? '#E23B3B' : '#D9DEE3'));
+  // missions
+  if (userTouched !== undefined) {
+    for (const m of MISSIONS) if (!done.has(m.id) && m.test(r)) {
+      done.add(m.id); try { localStorage.setItem('lab5-done', JSON.stringify([...done])); } catch (e) {}
+      say(`<b>مهمة منجزة: ${m.t}!</b>&nbsp;${m.say || 'أحسنت: اللوح يعطي أكثر حين يواجه الشمس دون أي ظل.'}`, true);
+      if (done.size === MISSIONS.length) setTimeout(() => say('<b>أنهيت المهمات الخمس!</b>&nbsp;أنت الآن خبير ألواح. افتح «جواز صياد الشمس» واربح ختم الوحدة 5.', true), 3500);
+      break;
+    }
+    paintMissions();
+  }
+}
+function say(t, good) { const m = $('msg'); m.className = 'msg' + (good ? ' good' : ''); m.innerHTML = t; }
+['time', 'tilt'].forEach(id => $(id).addEventListener('input', () => update(true)));
+$('clear').onclick = () => { shaded.fill(false); update(true); };
+$('quarter').onclick = () => { shaded.fill(false); for (let r = 0; r < ROWS; r++) for (let c = 3; c < 6; c++) if (r < 3) shaded[r * COLS + c] = true; update(true); };
+$('half').onclick = () => { shaded.fill(false); for (let i = 18; i < 36; i++) shaded[i] = true; update(true); };
+$('bypass').onclick = () => { bypass = !bypass; $('bypass').setAttribute('aria-pressed', bypass); say(bypass ? 'شغّلت صمامات التجاوز: اللوح الآن مقسوم إلى ثلاثة أجزاء، ولكل جزء ممر جانبي.' : 'أطفأت صمامات التجاوز: الخلايا الـ36 في سلسلة واحدة.'); update(true); };
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last = performance.now();
+function loop(now) { const dt = Math.min(0.1, (now - last) / 1000); last = now; if (!reduce) { off -= dt * (10 + 90 * speed); flow.setAttribute('stroke-dashoffset', off.toFixed(1)); } requestAnimationFrame(loop); }
+paintMissions(); update(); requestAnimationFrame(loop);
+})();
+</script>
+
+<a href="../u5.html" style="position:fixed;z-index:50;top:calc(10px + env(safe-area-inset-top,0px));left:max(10px,env(safe-area-inset-left,0px));background:#12355B;color:#FFF6E0;font:700 14px Cairo,Tajawal,system-ui,sans-serif;text-decoration:none;padding:6px 14px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.2)">→ المحطة 5</a>
+</body>
+</html>

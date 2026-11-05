@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المحطة 1 · من أين تأتي الطاقة؟</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="صيّاد الشمس · مهد لابز">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<script src="assets/progress.js"></script>
+<header class="band gut"><div class="wrap">
+<nav class="topnav"><a href="index.html">→ الطريق</a><span>المحطة 1 من 8</span></nav>
+<div class="hero"><span class="node"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="18" fill="currentColor"/><g stroke="currentColor" stroke-width="6" stroke-linecap="round"><line x1="50" y1="10" x2="50" y2="22"/><line x1="50" y1="78" x2="50" y2="90"/><line x1="10" y1="50" x2="22" y2="50"/><line x1="78" y1="50" x2="90" y2="50"/><line x1="22" y1="22" x2="30" y2="30"/><line x1="70" y1="70" x2="78" y2="78"/><line x1="22" y1="78" x2="30" y2="70"/><line x1="70" y1="30" x2="78" y2="22"/></g></svg></span><div><div class="eb">المحطة 1</div><h1>من أين تأتي الطاقة؟</h1></div></div>
+<p class="q">كيف تتحرّك الشمس في السماء، ومتى تكون أقوى؟</p>
+<div class="chips"><span class="chip">نصف نهار، بعودات قصيرة</span><span class="chip sun">يحتاج شمسا مباشرة</span><span class="chip">فيديو</span><span class="chip">نشاط على الشاشة</span></div>
+</div></header>
+<main class="gut"><div class="wrap">
+<ol class="steps">
+<li class="step"><h2>شاهد <small>فيديو المحطة</small></h2>
+<div class="vid"><video controls playsinline preload="none" poster="videos/u1.jpg" src="videos/u1.mp4"></video></div></li>
+<li class="step"><h2>جرّب <small>نصف نهار، بعودات قصيرة</small></h2>
+<ul class="tries"><li>نثبّت عصا على ورقة كبيرة ونرسم طرف ظلّها في كل عودة.</li><li>نقيس الحرارة في الشمس في كل عودة أيضا.</li><li>نصل النقاط ونرسم منحنى الحرارة: متى كان الظل أقصر؟ ومتى كانت الحرارة أعلى؟</li></ul>
+<div class="bring"><div><b>من الحقيبة</b><span>عصا وصلصال · ورقة A3 · ورق أسود · ميزان حرارة</span></div><div><b>من البيت</b><span>شريط لاصق · مسطرة · بوصلة · ساعة · أقلام ملوّنة</span></div></div>
+<p class="note">التعليمات الكاملة وأسئلة الدفتر في بطاقات الوحدة 1 داخل الحقيبة. اختر يوما صافيا بين 11:00 و15:00.</p>
+<a class="play" href="cards/u1.pdf" target="_blank" rel="noopener"><span><b>بطاقات الوحدة 1 (PDF)</b><span>دليل الأسرة والبطاقات والدفتر، جاهزة للطباعة على ورق A4 إن ضاعت ورقة.</span></span><span class="btn ghost">افتح</span></a></li>
+<li class="step"><h2>العب <small>على الشاشة</small></h2>
+<a class="play" href="play/shadow.html"><span><b>ظلّ العصا</b><span>حرّك الساعة وراقب الظلّ، وضع نقاطا لترسم طريق الشمس، وقارن الصيف بالشتاء.</span></span><span class="btn sun">افتح</span></a></li>
+<li class="step"><h2>اختم <small>أنهِ المحطة</small></h2>
+<p>حين تنهي التجربة وتملأ دفترك، علّم المحطة، ثم اربح ختمها في الجواز بخمسة أسئلة.</p>
+<div class="actions"><button type="button" class="btn" id="done">أنهيت هذه المحطة</button><a class="btn sun" href="passport.html#u1">اربح الختم</a></div>
+<p class="msg" id="dmsg" role="status"></p></li>
+</ol>
+<div class="pager"><a class="btn ghost" href="index.html">→ الطريق</a><a class="btn" href="u2.html">المحطة 2: صائد الحرارة ←</a></div>
+</div></main>
+<script>
+(function () {
+  const n = 1; SH.visit(n);
+  const b = document.getElementById('done'), m = document.getElementById('dmsg');
+  function paint() {
+    const s = SH.status(n), on = SH.finished(n);
+    b.textContent = on ? 'أنجزت هذه المحطة ✓' : 'أنهيت هذه المحطة'; b.classList.toggle('ok', on);
+    m.textContent = s === 'stamped' ? 'هذه المحطة مختومة في جوازك.' : on ? 'رائع! بقي أن تربح ختمها في الجواز.' : '';
+  }
+  b.onclick = () => { if (SH.status(n) === 'stamped') return; SH.setDone(n, !SH.done().has(n)); paint(); };
+  paint();
+})();
+</script>
+</body>
+</html>
