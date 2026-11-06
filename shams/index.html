@@ -70,6 +70,28 @@
 <svg class="conn" viewBox="0 0 100 54" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M25,0 C25,34 75,20 75,54"/></svg>
 <div class="finish"><a class="node" href="passport.html" aria-label="جواز صياد الشمس والشهادة"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="18" fill="currentColor"/><g stroke="currentColor" stroke-width="6" stroke-linecap="round"><line x1="50" y1="10" x2="50" y2="22"/><line x1="50" y1="78" x2="50" y2="90"/><line x1="10" y1="50" x2="22" y2="50"/><line x1="78" y1="50" x2="90" y2="50"/><line x1="22" y1="22" x2="30" y2="30"/><line x1="70" y1="70" x2="78" y2="78"/><line x1="22" y1="78" x2="30" y2="70"/><line x1="70" y1="30" x2="78" y2="22"/></g></svg></a><b>شهادة صياد الشمس</b><small>اجمع الأختام الثمانية في الجواز</small></div>
 </div>
+<section class="atelier" aria-labelledby="h-at">
+<div class="at-head"><p class="at-eb">من ورشات مهد الإبداع</p><h2 id="h-at">صيّاد الشمس وُلد في ورشة حقيقية</h2>
+<p>قبل أن تصير حقيبة، جرّب أطفال مهد الإبداع هذه التجارب بأيديهم: قاسوا جهد الألواح بالفولتمتر، ووصلوا الدارات، واقتربوا من لوح شمسي حقيقي.</p></div>
+<ul class="bento"><li class="g1"><button type="button" aria-label="تكبير الصورة: فريق صغير يصل لوحا شمسيا بالأسلاك"><img src="assets/photos/p3.jpg" alt="فريق صغير يصل لوحا شمسيا بالأسلاك" width="1400" height="1050" loading="lazy" decoding="async"><span>فريق صغير يصل لوحا شمسيا بالأسلاك</span></button></li><li class="g2"><button type="button" aria-label="تكبير الصورة: الفولتمتر يقرأ جهد اللوح"><img src="assets/photos/p1.jpg" alt="الفولتمتر يقرأ جهد اللوح" width="581" height="878" loading="lazy" decoding="async"><span>الفولتمتر يقرأ جهد اللوح</span></button></li><li class="g3"><button type="button" aria-label="تكبير الصورة: لوح حقيقي عن قرب، والأسلاك في يد الباحثة"><img src="assets/photos/p2.jpg" alt="لوح حقيقي عن قرب، والأسلاك في يد الباحثة" width="581" height="878" loading="lazy" decoding="async"><span>لوح حقيقي عن قرب، والأسلاك في يد الباحثة</span></button></li><li class="g4"><button type="button" aria-label="تكبير الصورة: أيدٍ صغيرة تركّب الدارة"><img src="assets/photos/p6.jpg" alt="أيدٍ صغيرة تركّب الدارة" width="937" height="800" loading="lazy" decoding="async"><span>أيدٍ صغيرة تركّب الدارة</span></button></li><li class="g5"><button type="button" aria-label="تكبير الصورة: كم يعطي اللوح الآن؟"><img src="assets/photos/p4.jpg" alt="كم يعطي اللوح الآن؟" width="716" height="828" loading="lazy" decoding="async"><span>كم يعطي اللوح الآن؟</span></button></li><li class="g6"><button type="button" aria-label="تكبير الصورة: نتعرّف خلايا اللوح الكبير"><img src="assets/photos/p5.jpg" alt="نتعرّف خلايا اللوح الكبير" width="716" height="828" loading="lazy" decoding="async"><span>نتعرّف خلايا اللوح الكبير</span></button></li></ul>
+<dialog class="lb" id="lb" aria-label="صور الورشة"><img alt=""><p></p><button type="button" class="lb-x" aria-label="إغلاق">×</button><button type="button" class="lb-p" aria-label="السابقة">›</button><button type="button" class="lb-n" aria-label="التالية">‹</button><span class="lb-c"></span></dialog>
+<script>
+(function () {
+  const d = document.getElementById('lb'), im = d.querySelector('img'), cap = d.querySelector('p'), cnt = d.querySelector('.lb-c');
+  const B = [...document.querySelectorAll('.bento button')]; let i = 0;
+  function show(k) { i = (k + B.length) % B.length; const s = B[i].querySelector('img'); im.src = s.src; im.alt = s.alt; cap.textContent = s.alt; cnt.textContent = (i + 1) + ' / ' + B.length; }
+  B.forEach((b, k) => b.addEventListener('click', () => { show(k); if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }));
+  d.querySelector('.lb-x').onclick = () => d.close();
+  d.querySelector('.lb-n').onclick = () => show(i + 1);
+  d.querySelector('.lb-p').onclick = () => show(i - 1);
+  d.addEventListener('click', e => { if (e.target === d) d.close(); });
+  d.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(i + 1); if (e.key === 'ArrowRight') show(i - 1); });
+  let x0 = null;
+  d.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  d.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(i + (dx > 0 ? 1 : -1)); x0 = null; });
+})();
+</script>
+</section>
 <nav class="more" aria-label="روابط أخرى">
 <a href="passport.html"><b>جواز صياد الشمس</b><span>خمسة أسئلة لكل محطة، وختم عند النجاح</span></a>
 <a href="parents.html"><b>ركن الوالدين</b><span>التقدّم، والأدوات، ورمز استعادة التقدّم</span></a>
